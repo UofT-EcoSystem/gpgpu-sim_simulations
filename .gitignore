@@ -7,3 +7,7 @@ benchmarks/data_dirs/pannotia
 benchmarks/data_dirs/proxy-apps-doe
 benchmarks/src/cuda/dragon_li/cdp_bin/
 *.DS_Store
+*.ptx
+*.ptxas
+_app_cuda*
+_cuobjdump*

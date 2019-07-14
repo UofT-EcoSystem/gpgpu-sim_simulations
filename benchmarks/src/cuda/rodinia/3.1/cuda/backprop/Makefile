@@ -10,9 +10,9 @@ NVCC_FLAGS = -I$(CUDA_DIR)/include
 
 # 'make dbg=1' enables NVCC debugging
 ifeq ($(dbg),1)
-	NVCC_FLAGS += -g -O0 $(GENCODE_SM10) $(GENCODE_SM13) $(GENCODE_ARCH) $(GENCODE_SM20) $(GENCODE_SM30) $(GENCODE_SM35) $(GENCODE_SM50) $(GENCODE_SM60) $(GENCODE_SM62)
+	NVCC_FLAGS += -g -O0 $(GENCODE_ARCH) $(GENCODE_SM20) $(GENCODE_SM30) $(GENCODE_SM35) $(GENCODE_SM50) $(GENCODE_SM60) $(GENCODE_SM62) $(GENCODE_SM70)
 else
-	NVCC_FLAGS += -O2 $(GENCODE_SM10) $(GENCODE_SM13) $(GENCODE_ARCH) $(GENCODE_SM20) $(GENCODE_SM30) $(GENCODE_SM35) $(GENCODE_SM50) $(GENCODE_SM60) $(GENCODE_SM62)
+	NVCC_FLAGS += -O2 $(GENCODE_ARCH) $(GENCODE_SM20) $(GENCODE_SM30) $(GENCODE_SM35) $(GENCODE_SM50) $(GENCODE_SM60) $(GENCODE_SM62) $(GENCODE_SM70)
 endif
 
 # 'make emu=1' compiles the CUDA kernels for emulation
@@ -34,7 +34,7 @@ backprop.o: backprop.c backprop.h
 	$(CC) $(CC_FLAGS) backprop.c -c
 
 backprop_cuda.o: backprop_cuda.cu backprop.h
-	$(NVCC) $(NVCC_FLAGS) -c backprop_cuda.cu
+	$(NVCC) $(NVCC_FLAGS) -c --cudart=shared -lcudart backprop_cuda.cu
 
 imagenet.o: imagenet.c backprop.h
 	$(CC) $(CC_FLAGS) imagenet.c -c
