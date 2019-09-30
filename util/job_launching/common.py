@@ -41,6 +41,7 @@ def get_config(name, defined_baseconfigs, defined_xtracfgs):
                 (oldName, oldXtra + "\n#{0}\n{1}\n".format(token, defined_xtracfgs[token]), oldBasename)
     return config
 
+
 def load_defined_yamls():
     define_yamls = glob.glob(os.path.join(this_directory, 'apps/define-*.yml'))
     for def_yaml in define_yamls:
@@ -49,28 +50,24 @@ def load_defined_yamls():
     for def_yaml in define_yamls:
         parse_config_definition_yaml( os.path.join(this_directory, 'configs', def_yaml), defined_baseconfigs, defined_xtracfgs )
 
+
 def parse_app_definition_yaml( def_yml, apps ):
     benchmark_yaml = yaml.load(open(def_yml))
     for suite in benchmark_yaml:
-        apps[suite] = []
         for exe in benchmark_yaml[suite]['execs']:
             exe_name = exe.keys()[0]
             args_list = exe.values()[0]
-            apps[suite].append(( benchmark_yaml[suite]['exec_dir'],
-                                 benchmark_yaml[suite]['data_dirs'],
-                                 exe_name, args_list ))
-            apps[suite + ":" + exe_name] = []
-            apps[suite + ":" + exe_name].append( ( benchmark_yaml[suite]['exec_dir'],
-                                 benchmark_yaml[suite]['data_dirs'],
-                                 exe_name, args_list ) )
+
+            # replace data dir in args list with real path
+            args_list = [args.replace("DATA", benchmark_yaml[suite]['data_dirs']) if args else "" for args in args_list]
+                
             count = 0
             for args in args_list:
-                apps[suite + ":" + exe_name + ":" + str(count) ] = []
-                apps[suite + ":" + exe_name + ":" + str(count) ].append( ( benchmark_yaml[suite]['exec_dir'],
-                                    benchmark_yaml[suite]['data_dirs'],
-                                    exe_name, [args] ) )
+                apps[suite + "-" + exe_name + "-" + str(count) ] = []
+                apps[suite + "-" + exe_name + "-" + str(count) ].append( ( exe_name, [args] ) )
                 count += 1
     return
+
 
 def parse_config_definition_yaml( def_yml, defined_baseconfigs, defined_xtracfgs ):
     configs_yaml = yaml.load(open( def_yml ))
@@ -81,14 +78,25 @@ def parse_config_definition_yaml( def_yml, defined_baseconfigs, defined_xtracfgs
             defined_xtracfgs[config] = configs_yaml[config]['extra_params']
     return
 
-def gen_apps_from_suite_list( app_list ):
-    benchmarks = []
-    for app in app_list:
-        benchmarks += defined_apps[app]
-    return benchmarks
+
+def parse_pair_file(pair_file):
+    pairs = []
+    with open(pair_file) as pf:
+        for line in pf:
+            kernel_pair = line.strip('\n').split(',')
+            kernel_pair = [k.strip() for k in kernel_pair]
+            pairs.append(kernel_pair)
+
+    return pairs
+
+
+def get_inputs_from_app(app):
+    return defined_apps[app]
+
 
 def gen_configs_from_list( cfg_list ):
     configs = []
+
     for cfg in cfg_list:
         configs.append(get_config(cfg, defined_baseconfigs, defined_xtracfgs))
     return configs
@@ -137,20 +145,23 @@ def dir_option_test(name, default, this_directory):
 def parse_run_simulations_options():
     parser = OptionParser()
     parser.add_option("-B", "--benchmark_list", dest="benchmark_list",
-                  help="a comma seperated list of benchmark suites to run. See apps/define-*.yml for " +\
+                  help="A file with all benchmark pairs to run. See apps/define-*.yml for " +\
                         "the benchmark suite names.",
-                  default="rodinia_2.0-ft")
+                  default="apps/default.pair")
     parser.add_option("-C", "--configs_list", dest="configs_list",
                   help="a comma seperated list of configs to run. See configs/define-*.yml for " +\
                         "the config names.",
                   default="GTX480")
+    parser.add_option("-E", "--benchmark-root", dest="benchmark_root",
+                  help="ABSOLUTE path of the benchmarkv2 root directory.",
+                  default="/mnt/GPU-Virtualization-Benchmarks/benchmarksv2/")
     parser.add_option("-p", "--benchmark_exec_prefix", dest="benchmark_exec_prefix",
                  help="When submitting the job to torque this string" +\
                  " is placed before the command line that runs the benchmark. " +\
                  " Useful when wanting to run valgrind.", default="")
     parser.add_option("-r", "--run_directory", dest="run_directory",
-                  help="Name of directory in which to run simulations",
-                  default="")
+                  help="ABSOLUTE path of the directory in which to run simulations",
+                  default=""),
     parser.add_option("-n", "--no_launch", dest="no_launch", action="store_true",
                   help="When set, no torque jobs are launched.  However, all"+\
                   " the setup for running is performed. ie, the run"+\
