@@ -1,3 +1,1 @@
-parboil-parb_sgemm-0, parboil-parb_stencil-0
-parboil-parb_sgemm-0, parboil-parb_spmv-0
-parboil-parb_sgemm-0, parboil-parb_lbm-0
+parb_sgemm-0, parb_spmv-0

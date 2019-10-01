@@ -52,7 +52,7 @@ def load_defined_yamls():
 
 
 def parse_app_definition_yaml( def_yml, apps ):
-    benchmark_yaml = yaml.load(open(def_yml))
+    benchmark_yaml = yaml.load(open(def_yml), Loader=yaml.FullLoader)
     for suite in benchmark_yaml:
         for exe in benchmark_yaml[suite]['execs']:
             exe_name = exe.keys()[0]
@@ -63,13 +63,13 @@ def parse_app_definition_yaml( def_yml, apps ):
                 
             count = 0
             for args in args_list:
-                apps[suite + "-" + exe_name + "-" + str(count) ] = (exe_name, args)
+                apps[ exe_name + "-" + str(count) ] = (exe_name, args)
                 count += 1
     return
 
 
 def parse_config_definition_yaml( def_yml, defined_baseconfigs, defined_xtracfgs ):
-    configs_yaml = yaml.load(open( def_yml ))
+    configs_yaml = yaml.load(open( def_yml ), Loader=yaml.FullLoader)
     for config in configs_yaml:
         if 'base_file' in configs_yaml[config]:
             defined_baseconfigs[config] = os.path.expandvars(configs_yaml[config]['base_file'])

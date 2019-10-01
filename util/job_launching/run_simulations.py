@@ -24,6 +24,7 @@ def extract_so_name( so_path ):
     returnStr = re.sub( r".*SONAME\s+([^\s]+).*", r"\1", objdump_out_file.read().strip().replace("\n", " ") )
     objdump_out_file.close()
     os.remove(objdump_out_filename)
+    returnStr = returnStr.replace(".so", "")
     return returnStr
 
 
@@ -121,7 +122,6 @@ class ConfigurationSpec:
             if os.path.isfile(new_file):
                 os.remove(new_file)
             shutil.copyfile(file_to_cp, new_file)
-            print(file_to_cp, '\n', new_file)
 
     # replaces all the "REAPLCE_*" strings in the torque.sim file
     def text_replace_torque_sim( self, this_run_dir, pair, version_str, options):
@@ -154,7 +154,7 @@ class ConfigurationSpec:
             _input_2 = 'dont_care'
             _app_2_short = 'dont care'
 
-        replacement_dict = {"NAME": pair_str + "-" + self.run_subdir + "." + version_str,
+        replacement_dict = {"NAME": pair_str + '-' + self.run_subdir,
                             "NODES": "1",
                             "PPN": "4",
                             "QUEUE_NAME": queue_name,
@@ -222,6 +222,8 @@ try:
     os.makedirs(options.run_directory)
 except:
     print("Failed to create run directory %s, exiting"%options.run_directory)
+    print("Make sure the run dir does not exist. We don't want to override it.")
+    exit(2)
 
 # 2. Copy .so file into run dir
 # Let's copy out the .so file so that builds don't interfere with running tests
