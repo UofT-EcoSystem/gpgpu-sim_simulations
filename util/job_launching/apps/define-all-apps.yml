@@ -45,7 +45,7 @@ parboil:
       - -i DATA/histo/default/input/img.bin -o ref.bmp -- 20 4
 
     - parb_spmv:
-      - -i DATA/spmv/large/input/Dubcova3.mtx.bin,./data/large/input/vector.bin -o Dubcova3.mtx.out
+      - -i DATA/spmv/large/input/Dubcova3.mtx.bin,DATA/spmv/large/input/vector.bin -o Dubcova3.mtx.out
 
     - parb_mri-gridding:
       - -i DATA/mri-gridding/small/input/small.uks -o output.txt -- 32 0

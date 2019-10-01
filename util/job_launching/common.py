@@ -63,8 +63,7 @@ def parse_app_definition_yaml( def_yml, apps ):
                 
             count = 0
             for args in args_list:
-                apps[suite + "-" + exe_name + "-" + str(count) ] = []
-                apps[suite + "-" + exe_name + "-" + str(count) ].append( ( exe_name, [args] ) )
+                apps[suite + "-" + exe_name + "-" + str(count) ] = (exe_name, args)
                 count += 1
     return
 
@@ -85,13 +84,22 @@ def parse_pair_file(pair_file):
         for line in pf:
             kernel_pair = line.strip('\n').split(',')
             kernel_pair = [k.strip() for k in kernel_pair]
+
+            if len(kernel_pair) < 1 or len(kernel_pair) > 2:
+                print("Error, we only only running one or two kernels for each run. Current run:")
+                print(kernel_pair)
+                exit(1)
+
             pairs.append(kernel_pair)
 
     return pairs
 
 
 def get_inputs_from_app(app):
-    return defined_apps[app]
+    if app in defined_apps:
+        return defined_apps[app][0] + ' ' + defined_apps[app][1]
+    else:
+        return ''
 
 
 def gen_configs_from_list( cfg_list ):

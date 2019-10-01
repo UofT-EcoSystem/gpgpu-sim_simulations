@@ -26,17 +26,25 @@ echo "doing: cd REPLACE_SUBDIR"
 cd REPLACE_SUBDIR
 
 echo "doing: cmake REPLACE_CMAKE_DIR"
-cmake $BENCH_HOME
+if REPLACE_VALID_APP_2; then
+    cmake $BENCH_HOME -DREPLACE_SHORT_APP_1=ON -DREPLACE_SHORT_APP_2=ON
+else
+    cmake $BENCH_HOME -DREPLACE_SHORT_APP_1=ON
+fi
 
 echo "doing: make -j4"
 make -j4
 
 echo "doing: write input files"
 echo "REPLACE_INPUT_1" > REPLACE_APP_1.txt
-echo "REPLACE_INPUT_2" > REPLACE_APP_2.txt
 
-echo "doing REPLACE_BENCHMARK_SPECIFIC_COMMAND"
-REPLACE_BENCHMARK_SPECIFIC_COMMAND
+if REPLACE_VALID_APP_2; then
+    echo "REPLACE_INPUT_2" > REPLACE_APP_2.txt
+fi
+
+# echo "doing REPLACE_BENCHMARK_SPECIFIC_COMMAND"
+# REPLACE_BENCHMARK_SPECIFIC_COMMAND
+
 echo "doing: export PATH=REPLACE_PATH"
 export PATH=REPLACE_PATH
 
@@ -44,5 +52,12 @@ export PATH=REPLACE_PATH
 # echo "doing export CUDA_LAUNCH_BLOCKING=1"
 # export CUDA_LAUNCH_BLOCKING=1
 
-echo "doing: ./driver REPLACE_APP_1.txt REPLACE_APP_2.txt"
-./driver REPLACE_APP_1.txt REPLACE_APP_2.txt
+ldd driver | tee ldpath.txt
+
+if REPLACE_VALID_APP_2; then
+    echo "doing: ./driver REPLACE_APP_1.txt REPLACE_APP_2.txt"
+    ./driver REPLACE_APP_1.txt REPLACE_APP_2.txt | tee whatup.txt
+else
+    echo "doing: ./driver REPLACE_APP_1.txt"
+    ./driver REPLACE_APP_1.txt | tee whatup.txt
+fi

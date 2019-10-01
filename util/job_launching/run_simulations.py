@@ -65,9 +65,9 @@ class ConfigurationSpec:
                 torque_out_file = open(torque_out_filename, 'w+')
                 saved_dir = os.getcwd()
                 os.chdir(this_run_dir)
-                if subprocess.call(["qsub",\
-                                    "-W", "umask=022",\
-                                   this_run_dir + "torque.sim"],\
+                if subprocess.call(["qsub",
+                                    "-W", "umask=022",
+                                    os.path.join(this_run_dir, "torque.sim")],
                                    stdout=torque_out_file) < 0:
                     exit("Error Launching Torque Job")
                 else:
@@ -96,12 +96,11 @@ class ConfigurationSpec:
                     logfile = open(this_directory +\
                                    "logfiles/"+ log_name + "." +\
                                    day_string + ".txt",'a')
-                    print >> logfile, "%s %6s %-22s %-25s %s.%s" %\
-                           ( time_string ,\
-                           torque_out ,\
-                           self.benchmark_args_subdirs[args] ,\
-                           self.run_subdir,\
-                           pair_str,\
+                    print >> logfile, "%s %6s %-25s %s.%s" %\
+                           ( time_string ,
+                           torque_out ,
+                           self.run_subdir,
+                           pair_str,
                            version_string )
                     logfile.close()
 
@@ -122,6 +121,7 @@ class ConfigurationSpec:
             if os.path.isfile(new_file):
                 os.remove(new_file)
             shutil.copyfile(file_to_cp, new_file)
+            print(file_to_cp, '\n', new_file)
 
     # replaces all the "REAPLCE_*" strings in the torque.sim file
     def text_replace_torque_sim( self, this_run_dir, pair, version_str, options):
@@ -140,6 +140,20 @@ class ConfigurationSpec:
         else:
             queue_name = os.getenv("TORQUE_QUEUE_NAME")
 
+        _input_1 = common.get_inputs_from_app(pair[0])
+        _app_1_short = _input_1.split(' ')[0]
+
+        if len(pair) > 1:
+            _valid_app_2 = 'true'
+            _app_2 = pair[1]
+            _input_2 = common.get_inputs_from_app(pair[1])
+            _app_2_short = _input_2.split(' ')[0]
+        else:
+            _valid_app_2 = 'false'
+            _app_2 = 'dont_care'
+            _input_2 = 'dont_care'
+            _app_2_short = 'dont care'
+
         replacement_dict = {"NAME": pair_str + "-" + self.run_subdir + "." + version_str,
                             "NODES": "1",
                             "PPN": "4",
@@ -149,9 +163,12 @@ class ConfigurationSpec:
                             "LIBPATH": options.so_dir,
                             "SUBDIR": this_run_dir,
                             "APP_1": pair[0],
-                            "APP_2": pair[1],
-                            "INPUT_1": common.get_inputs_from_app(pair[0]),
-                            "INPUT_2": common.get_inputs_from_app(pair[1]),
+                            "SHORT_APP_1": _app_1_short,
+                            "VALID_APP_2": _valid_app_2,
+                            "APP_2": _app_2,
+                            "SHORT_APP_2": _app_2_short,
+                            "INPUT_1": _input_1,
+                            "INPUT_2": _input_2,
                             "PATH": os.getenv("PATH"),
                             }
 
@@ -199,7 +216,7 @@ cuda_version = common.get_cuda_version( this_directory )
 
 # 1. Make run directory
 if options.run_directory == "":
-    options.run_directory = os.path.join(this_directory, "../../sim_run_%s"%cuda_version)
+    options.run_directory = os.path.join(this_directory, "../../sim_run_%s" % cuda_version)
 
 try:
     os.makedirs(options.run_directory)
@@ -222,7 +239,7 @@ if not os.path.exists( running_so_dir ):
         os.makedirs( running_so_dir )
     except:
         pass
-    shutil.copy( so_path, running_so_dir )
+    shutil.copyfile( so_path, os.path.join(running_so_dir, "libcudart.so." + cuda_version) )
 options.so_dir = running_so_dir
 
 # 3. Load yaml defines
