@@ -1,9 +1,9 @@
 #!/bin/sh
 
 # start server
-sudo /opt/local/sbin/pbs_server 
-sudo /etc/init.d/pbs_mom
-sudo /etc/init.d/pbs_sched
+sudo pbs_server
+sudo pbs_mom
+sudo pbs_sched
 
 
 qsub torque.sim
