@@ -150,15 +150,18 @@ class ConfigurationSpec:
             _app_2 = pair[1]
             _input_2 = common.get_inputs_from_app(pair[1])
             _app_2_short = _input_2.split(' ')[0]
+
+            _ppn = "4"
         else:
             _valid_app_2 = 'false'
             _app_2 = 'dont_care'
             _input_2 = 'dont_care'
             _app_2_short = 'dont care'
+            _ppn = "3"
 
         replacement_dict = {"NAME": version_string + '-' + self.run_subdir + '-' + pair_str,
                             "NODES": "1",
-                            "PPN": "4",
+                            "PPN": _ppn,
                             "QUEUE_NAME": queue_name,
                             "GPGPUSIM_ROOT": os.getenv("GPGPUSIM_ROOT"),
                             "BENCH_HOME": options.benchmark_root,
