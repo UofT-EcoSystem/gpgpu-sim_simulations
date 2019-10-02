@@ -97,9 +97,11 @@ class ConfigurationSpec:
                     logfile = open(this_directory +\
                                    "logfiles/"+ log_name + "." +\
                                    day_string + ".txt",'a')
-                    print >> logfile, "%s %6s %-25s %s.%s" %\
+                    print >> logfile, "%s %6s %-22s %-100s %-25s %s.%s" %\
                            ( time_string ,
                            torque_out ,
+                           pair_str,
+                           options.run_directory,
                            self.run_subdir,
                            pair_str,
                            version_string )
@@ -154,7 +156,7 @@ class ConfigurationSpec:
             _input_2 = 'dont_care'
             _app_2_short = 'dont care'
 
-        replacement_dict = {"NAME": pair_str + '-' + self.run_subdir,
+        replacement_dict = {"NAME": version_string + '-' + self.run_subdir + '-' + pair_str,
                             "NODES": "1",
                             "PPN": "4",
                             "QUEUE_NAME": queue_name,
@@ -218,12 +220,12 @@ cuda_version = common.get_cuda_version( this_directory )
 if options.run_directory == "":
     options.run_directory = os.path.join(this_directory, "../../sim_run_%s" % cuda_version)
 
-try:
-    os.makedirs(options.run_directory)
-except:
-    print("Failed to create run directory %s, exiting"%options.run_directory)
-    print("Make sure the run dir does not exist. We don't want to override it.")
-    exit(2)
+if not os.path.isdir(options.run_directory):
+    try:
+        os.makedirs(options.run_directory)
+    except:
+        print("Failed to create run directory %s"%options.run_directory)
+        exit(1)
 
 # 2. Copy .so file into run dir
 # Let's copy out the .so file so that builds don't interfere with running tests
