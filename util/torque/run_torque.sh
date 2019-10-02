@@ -2,14 +2,13 @@
 
 # start server
 sudo /opt/local/sbin/pbs_server 
-sudo /etc/init.d/pbs_mom start
-sudo /etc/init.d/pbs_sched start
+sudo /etc/init.d/pbs_mom
+sudo /etc/init.d/pbs_sched
 
 
-cd run
-/opt/local/bin/qsub torque.sim
+qsub torque.sim
 
-/opt/local/bin/qstat
+qstat
 
 sleep 5
 
