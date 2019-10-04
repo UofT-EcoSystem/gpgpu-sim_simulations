@@ -21,11 +21,19 @@ def extract_so_name( so_path ):
     objdump_out_file = open(objdump_out_filename, 'w+')
     subprocess.call(["objdump", "-p", so_path], stdout=objdump_out_file)
     objdump_out_file.seek(0)
-    returnStr = re.sub( r".*SONAME\s+([^\s]+).*", r"\1", objdump_out_file.read().strip().replace("\n", " ") )
+
+    full_str = re.sub( r".*SONAME\s+([^\s]+).*", r"\1", objdump_out_file.read().strip().replace("\n", " ") )
+    full_str = full_str.replace(".so", "")
+
+    # grep the commit half
+    match_str = re.search(r"commit-([0-9|a-f]*)_modified.*", full_str)
+    commit_id = match_str.group(1)
+    return_str = match_str.group(0).replace(commit_id, commit_id[-5:], 1)
+    return_str = return_str.replace("-", "_")
+
     objdump_out_file.close()
     os.remove(objdump_out_filename)
-    returnStr = returnStr.replace(".so", "")
-    return returnStr
+    return return_str
 
 
 #######################################################################################
@@ -51,8 +59,8 @@ class ConfigurationSpec:
     def run(self, version_string, benchmarks, options):
         for pair in benchmarks:
             pair_str = '-'.join(pair)
-            this_run_dir = options.run_directory +\
-                        "/" + self.run_subdir + "/" + pair_str
+            this_run_dir = options.run_directory + \
+                "/" + pair_str + "/" + self.run_subdir
 
             self.setup_run_directory(this_run_dir)
 
@@ -97,11 +105,10 @@ class ConfigurationSpec:
                     logfile = open(this_directory +\
                                    "logfiles/"+ log_name + "." +\
                                    day_string + ".txt",'a')
-                    print >> logfile, "%s %6s %-22s %-100s %-25s %s.%s" %\
+                    print >> logfile, "%s %6s %-22s %-25s %s.%s" %\
                            ( time_string ,
                            torque_out ,
                            pair_str,
-                           options.run_directory,
                            self.run_subdir,
                            pair_str,
                            version_string )
@@ -159,7 +166,7 @@ class ConfigurationSpec:
             _app_2_short = 'dont care'
             _ppn = "3"
 
-        replacement_dict = {"NAME": version_string + '-' + self.run_subdir + '-' + pair_str,
+        replacement_dict = {"NAME": pair_str + '-' + self.run_subdir + '-' + version_string,
                             "NODES": "1",
                             "PPN": _ppn,
                             "QUEUE_NAME": queue_name,
