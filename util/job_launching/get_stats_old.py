@@ -105,7 +105,7 @@ exes_and_args = []
 specific_jobIds = {}
 
 stats_to_pull = {}
-stats_yaml = yaml.load(open(options.stats_yml))
+stats_yaml = yaml.load(open(options.stats_yml), Loader=yaml.FullLoader)
 stats= {}
 for stat in stats_yaml['collect']:
     stats_to_pull[stat] = re.compile(stat)
@@ -154,17 +154,19 @@ else:
             added_cfgs = set()
             added_apps = set()
             for line in f:
-                jobtime, jobId, app ,args, config, jobname = line.split()
+                jobtime, jobId, pair_str, config, gpusim_version = line.split()
+
                 if config not in added_cfgs:
                     configs.append(config)
                     added_cfgs.add(config)
-                app_and_args = os.path.join( app.replace('/','_'), args )
-                if app_and_args not in added_apps:
-                    apps_and_args.append( app_and_args )
-                    exe_and_args = os.path.join( os.path.basename(app), args)
-                    exes_and_args.append(exe_and_args)
-                    added_apps.add(app_and_args)
-                specific_jobIds[ config + app_and_args ] = (jobId,jobname)
+
+                if pair_str not in added_apps:
+                    apps_and_args.append(pair_str)
+                    # exe_and_args = os.path.join(os.path.basename(app), args)
+                    # exes_and_args.append(exe_and_args)
+                    added_apps.add(pair_str)
+
+                specific_jobIds[config + app_and_args] = (jobId, jobname)
 
 all_named_kernels = {}
 for idx, app_and_args in enumerate(apps_and_args):
