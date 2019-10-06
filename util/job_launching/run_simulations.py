@@ -16,13 +16,13 @@ this_directory = os.path.dirname(os.path.realpath(__file__)) + "/"
 
 # This function will pull the SO name out of the shared object,
 # which will have current GIT commit number attatched.
-def extract_so_name( so_path ):
+def extract_so_name(so_path):
     objdump_out_filename = this_directory + "so_objdump_out.{0}.txt".format(os.getpid())
     objdump_out_file = open(objdump_out_filename, 'w+')
     subprocess.call(["objdump", "-p", so_path], stdout=objdump_out_file)
     objdump_out_file.seek(0)
 
-    full_str = re.sub( r".*SONAME\s+([^\s]+).*", r"\1", objdump_out_file.read().strip().replace("\n", " ") )
+    full_str = re.sub(r".*SONAME\s+([^\s]+).*", r"\1", objdump_out_file.read().strip().replace("\n", " "))
     full_str = full_str.replace(".so", "")
 
     # grep the commit half
@@ -46,7 +46,7 @@ class ConfigurationSpec:
     # Public Interface methods
     #########################################################################################
     # Class is constructed with a single line of text from the sweep_param file
-    def __init__(self, ( name, params, config_file ) ):
+    def __init__(self, ( name, params, config_file )):
         self.run_subdir = name
         self.params = params
         self.config_file = config_file
@@ -60,7 +60,7 @@ class ConfigurationSpec:
         for pair in benchmarks:
             pair_str = '-'.join(pair)
             this_run_dir = options.run_directory + \
-                "/" + pair_str + "/" + self.run_subdir
+                           "/" + pair_str + "/" + self.run_subdir
 
             self.setup_run_directory(this_run_dir)
 
@@ -83,7 +83,7 @@ class ConfigurationSpec:
                     # Parse the torque output for just the numeric ID
                     torque_out_file.seek(0)
                     torque_out = re.sub(r"(^\d+).*", r"\1",
-                        torque_out_file.read().strip())
+                                        torque_out_file.read().strip())
                     print("Job " + torque_out + " queued (" + pair_str + ", " + self.run_subdir + ")")
                 torque_out_file.close()
                 os.remove(torque_out_filename)
@@ -102,16 +102,15 @@ class ConfigurationSpec:
                     day_string = now_time.strftime("%y.%m.%d-%A")
                     time_string = now_time.strftime("%H:%M:%S")
                     log_name = "sim_log.{0}".format(options.launch_name)
-                    logfile = open(this_directory +\
-                                   "logfiles/"+ log_name + "." +\
-                                   day_string + ".txt",'a')
-                    print >> logfile, "%s %6s %-22s %-25s %s.%s" %\
-                           ( time_string ,
-                           torque_out ,
-                           pair_str,
-                           self.run_subdir,
-                           pair_str,
-                           version_string )
+                    logfile = open(this_directory + \
+                                   "logfiles/" + log_name + "." + \
+                                   day_string + ".txt", 'a')
+                    print >> logfile, "%s %6s %-22s %-25s %s" % \
+                                      (time_string,
+                                       torque_out,
+                                       pair_str,
+                                       self.run_subdir,
+                                       version_string)
                     logfile.close()
 
     #########################################################################################
@@ -122,18 +121,18 @@ class ConfigurationSpec:
         if not os.path.isdir(this_run_dir):
             os.makedirs(this_run_dir)
 
-        files_to_copy_to_run_dir = glob.glob(os.path.dirname(self.config_file) + "/*.icnt") +\
+        files_to_copy_to_run_dir = glob.glob(os.path.dirname(self.config_file) + "/*.icnt") + \
                                    glob.glob(os.path.dirname(self.config_file) + "/*.xml")
 
         for file_to_cp in files_to_copy_to_run_dir:
             new_file = os.path.join(this_run_dir,
-                               os.path.basename(this_directory + file_to_cp))
+                                    os.path.basename(this_directory + file_to_cp))
             if os.path.isfile(new_file):
                 os.remove(new_file)
             shutil.copyfile(file_to_cp, new_file)
 
     # replaces all the "REAPLCE_*" strings in the torque.sim file
-    def text_replace_torque_sim( self, this_run_dir, pair, version_str, options):
+    def text_replace_torque_sim(self, this_run_dir, pair, version_str, options):
         pair_str = '-'.join(pair)
 
         # Test the existance of required env variables
@@ -207,9 +206,10 @@ class ConfigurationSpec:
 
         open(os.path.join(this_run_dir, "gpgpusim.config"), 'w').write(config_text)
 
-#-----------------------------------------------------------
+
+# -----------------------------------------------------------
 # main script start
-#-----------------------------------------------------------
+# -----------------------------------------------------------
 (options, args) = common.parse_run_simulations_options()
 
 # 0. Environment checks
@@ -224,7 +224,7 @@ if not any([os.path.isfile(os.path.join(p, "qsub")) for p in os.getenv("PATH").s
 if not any([os.path.isfile(os.path.join(p, "nvcc")) for p in os.getenv("PATH").split(os.pathsep)]):
     exit("ERROR - Cannot find nvcc PATH... Is CUDA_INSTALL_PATH/bin in the system PATH?")
 
-cuda_version = common.get_cuda_version( this_directory )
+cuda_version = common.get_cuda_version(this_directory)
 
 # 1. Make run directory
 if options.run_directory == "":
@@ -234,41 +234,40 @@ if not os.path.isdir(options.run_directory):
     try:
         os.makedirs(options.run_directory)
     except:
-        print("Failed to create run directory %s"%options.run_directory)
+        print("Failed to create run directory %s" % options.run_directory)
         exit(1)
 
 # 2. Copy .so file into run dir
 # Let's copy out the .so file so that builds don't interfere with running tests
 # If the user does not specify a so file, then use the one in the git repo and copy it out.
 options.so_dir = common.dir_option_test(
-    options.so_dir, os.path.join( os.getenv("GPGPUSIM_ROOT"), "lib", os.getenv("GPGPUSIM_CONFIG") ),
-    this_directory )
-so_path = os.path.join( options.so_dir, "libcudart.so" )
-version_string = extract_so_name( so_path )
-running_so_dir = os.path.join( options.run_directory, "gpgpu-sim-builds", version_string )
-if not os.path.exists( running_so_dir ):
+    options.so_dir, os.path.join(os.getenv("GPGPUSIM_ROOT"), "lib", os.getenv("GPGPUSIM_CONFIG")),
+    this_directory)
+so_path = os.path.join(options.so_dir, "libcudart.so")
+version_string = extract_so_name(so_path)
+running_so_dir = os.path.join(options.run_directory, "gpgpu-sim-builds", version_string)
+if not os.path.exists(running_so_dir):
     # In the very rare case that concurrent builds try to make the directory at the same time
     # (after the test to os.path.exists -- this has actually happened...)
     try:
-        os.makedirs( running_so_dir )
+        os.makedirs(running_so_dir)
     except:
         pass
-    shutil.copyfile( so_path, os.path.join(running_so_dir, "libcudart.so." + cuda_version) )
+    shutil.copyfile(so_path, os.path.join(running_so_dir, "libcudart.so." + cuda_version))
 options.so_dir = running_so_dir
 
 # 3. Load yaml defines
 common.load_defined_yamls()
-
 
 # 4. Get benchmark pairs
 benchmarks = []
 benchmarks = common.parse_pair_file(options.benchmark_list)
 
 # 5. Parse configs
-cfgs = common.gen_configs_from_list( options.configs_list.split(",") )
+cfgs = common.gen_configs_from_list(options.configs_list.split(","))
 configurations = []
 for config in cfgs:
-    configurations.append( ConfigurationSpec( config ) )
+    configurations.append(ConfigurationSpec(config))
 
 print("Running Simulations with GPGPU-Sim built from \n{0}\n ".format(version_string) +
       "\nUsing configs: " + options.configs_list +
@@ -277,5 +276,3 @@ print("Running Simulations with GPGPU-Sim built from \n{0}\n ".format(version_st
 for config in configurations:
     config.my_print()
     config.run(version_string, benchmarks, options)
-
-
