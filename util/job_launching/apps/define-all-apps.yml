@@ -15,9 +15,9 @@ cutlass:
   data_dirs: ""
   execs:
     - cut_sgemm:
-      - 1024 512 512
-    - cut_wmma:
       - 2048 1024 64
+    - cut_wmma:
+      - 1024 512 512
 
 
 parboil:
