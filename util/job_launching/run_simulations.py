@@ -253,7 +253,8 @@ if not os.path.exists(running_so_dir):
         os.makedirs(running_so_dir)
     except:
         pass
-    shutil.copyfile(so_path, os.path.join(running_so_dir, "libcudart.so." + cuda_version))
+
+shutil.copyfile(so_path, os.path.join(running_so_dir, "libcudart.so." + cuda_version))
 options.so_dir = running_so_dir
 
 # 3. Load yaml defines
