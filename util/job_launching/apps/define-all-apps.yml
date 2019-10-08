@@ -30,7 +30,7 @@ parboil:
       - -i DATA/sgemm/medium/input/matrix1.txt,DATA/sgemm/medium/input/matrix2t.txt,DATA/sgemm/medium/input/matrix2t.txt -o matrix3.txt
 
     - parb_stencil:
-      - -i DATA/stencil/default/input/512x512x64x100.bin -o 512x512x64.out -- -- 512 512 64 100
+      - -i DATA/stencil/default/input/512x512x64x100.bin -o 512x512x64.out -- 512 512 64 100
 
     - parb_cutcp:
       - -i DATA/cutcp/small/input/watbox.sl40.pqr -o lattice.dat
