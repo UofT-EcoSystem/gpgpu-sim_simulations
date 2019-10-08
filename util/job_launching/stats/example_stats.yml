@@ -5,12 +5,11 @@
 # Here is a handy regex tester that helps get the thing right faster without re-running stuff:
 #   http://www.regexpal.com/
 
-collect:
-    - 'gpu_tot_sim_insn\s*=\s*(.*)'
-    - 'gpgpu_simulation_time\s*=.*\(([0-9]+) sec\).*'
-    - 'gpu_tot_ipc\s*=\s*(.*)'
-    - 'gpu_tot_sim_cycle\s*=\s*(.*)'
-    - '\s+L2_cache_stats_breakdown\[GLOBAL_ACC_R\]\[HIT\]\s*=\s*(.*)'
-    - '\s+L2_cache_stats_breakdown\[GLOBAL_ACC_R\]\[TOTAL_ACCESS\]\s*=\s*(.*)'
-    - '\s+L2_cache_stats_breakdown\[GLOBAL_ACC_W\]\[HIT\]\s*=\s*(.*)'
-    - '\s+L2_cache_stats_breakdown\[GLOBAL_ACC_W\]\[TOTAL_ACCESS\]\s*=\s*(.*)'
+'total_sim_insn': 'gpu_tot_sim_insn\s*=\s*(.*)'
+'simulation_time': 'gpgpu_simulation_time\s*=.*\(([0-9]+) sec\).*'
+'total_ipc': 'gpu_tot_ipc\s*=\s*(.*)'
+'total_sim_cycle': 'gpu_tot_sim_cycle\s*=\s*(.*)'
+'L2_cache[global_acc_r][hit]': '\s+L2_cache_stats_breakdown\[GLOBAL_ACC_R\]\[HIT\]\s*=\s*(.*)'
+'L2_cache[global_acc_r][total_acc]': '\s+L2_cache_stats_breakdown\[GLOBAL_ACC_R\]\[TOTAL_ACCESS\]\s*=\s*(.*)'
+'L2_cache[global_acc_r][hit]': '\s+L2_cache_stats_breakdown\[GLOBAL_ACC_W\]\[HIT\]\s*=\s*(.*)'
+'L2_cache[global_acc_r][total_acc]': '\s+L2_cache_stats_breakdown\[GLOBAL_ACC_W\]\[TOTAL_ACCESS\]\s*=\s*(.*)'

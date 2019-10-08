@@ -82,7 +82,12 @@ def parse_pair_file(pair_file):
     pairs = []
     with open(pair_file) as pf:
         for line in pf:
-            kernel_pair = line.strip('\n').split(',')
+            strip_line = line.strip().strip('\n')
+            if not strip_line:
+                # empty line
+                continue
+
+            kernel_pair = strip_line.split(',')
             kernel_pair = [k.strip() for k in kernel_pair]
 
             if len(kernel_pair) < 1 or len(kernel_pair) > 2:
