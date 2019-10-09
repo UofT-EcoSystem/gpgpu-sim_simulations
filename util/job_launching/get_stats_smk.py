@@ -49,6 +49,10 @@ parser.add_option("-S", "--stats_yml", dest="stats_yml", default="",
                   help="The yaml file that defines the stats you want to collect." + \
                        " by default it uses stats/example_stats.yml")
 
+parser.add_option("-l", "--log", dest="logfile", default="result.csv",
+        help="The logfile to save csv to.")
+
+
 # 1. Cmd parsing and sanity check
 (options, args) = parser.parse_args()
 
@@ -194,35 +198,43 @@ for idx, app_and_args in enumerate(apps_and_args):
                 if existance_test:
                     stat_found.add(stat_name)
                     number = existance_test.group(1).strip()
+                    number = number.replace(',', 'x') # avoid conflicts with csv commas
                     stat_map[app_and_args + config + stat_name] = number
 
-# print out the csv file
-print("-" * 100)
+            if (len(stat_found) == len(stats_to_pull)):
+                break
 
+# print out the csv file
+print('-'*100)
 # just to make sure we print the stats in deterministic order, store keys of the map into a stats_list
 stats_list = stats_to_pull.keys()
 
-print('pair_str,config,gpusim_version,jobId,' + ','.join(stats_list))
+with open(options.logfile, 'w+') as f:
+    f.write('pair_str,config,gpusim_version,jobId,' + ','.join(stats_list) + '\n')
+    print('pair_str,config,gpusim_version,jobId,' + ','.join(stats_list))
 
-for app_str in apps_and_args:
-    for config in configs:
-        if app_str + config + 'gpusim_version' not in stat_map:
-            continue
+    for app_str in apps_and_args:
+        for config in configs:
+            if app_str + config + 'gpusim_version' not in stat_map:
+                continue
 
-        csv_str = app_str + ',' \
-            + config + ',' \
-            + stat_map[app_str + config + 'gpusim_version'] + ',' \
-            + stat_map[app_str + config + 'jobid']
+            csv_str = app_str + ',' \
+                + config + ',' \
+                + stat_map[app_str + config + 'gpusim_version'] + ',' \
+                + stat_map[app_str + config + 'jobid']
 
-        for stat in stats_list:
-            if app_str + config + stat in stat_map:
-                csv_str += ',' + stat_map[app_str + config + stat]
-            else:
-                csv_str += ','
+            for stat in stats_list:
+                if app_str + config + stat in stat_map:
+                    csv_str += ',' + stat_map[app_str + config + stat]
+                else:
+                    csv_str += ','
 
-        print(csv_str)
+            f.write(csv_str + '\n')
+            print(csv_str)
 
-print("-" * 100)
+
+print("Write to file {0}".format(options.logfile))
+print('-'*100)
 
 duration = time.time() - start_time
 
