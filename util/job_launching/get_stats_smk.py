@@ -7,7 +7,7 @@ import subprocess
 import sys
 import common
 import math
-import yaml
+import oyaml as yaml
 import time
 
 millnames = ['', ' K', ' M', ' B', ' T']
@@ -145,6 +145,7 @@ for idx, app_and_args in enumerate(apps_and_args):
 
         # Do a quick 10000-line reverse pass to make sure the simualtion thread finished
         SIM_EXIT_STRING = "GPGPU-Sim: \*\*\* exit detected \*\*\*"
+        SIM_INACTIVE_STRING= "GPGPU-Sim: detected inactive GPU simulation thread"
         exit_success = False
         MAX_LINES = 10000
         BYTES_TO_READ = int(250 * 1024 * 1024)
@@ -159,6 +160,8 @@ for idx, app_and_args in enumerate(apps_and_args):
             if count >= MAX_LINES:
                 break
             exit_match = re.match(SIM_EXIT_STRING, line)
+            inactive_match = re.match(SIM_INACTIVE_STRING, line)
+            exit_match = exit_match or inactive_match
             if exit_match:
                 exit_success = True
                 break
