@@ -11,3 +11,6 @@ benchmarks/src/cuda/dragon_li/cdp_bin/
 *.ptxas
 _app_cuda*
 _cuobjdump*
+
+.idea/
+venv/
