@@ -34,6 +34,7 @@ parboil:
 
     - parb_cutcp:
       - -i DATA/cutcp/small/input/watbox.sl40.pqr -o lattice.dat
+      - -i DATA/cutcp/large/input/watbox.sl100.pqr -o lattice.dat
 
     - parb_mri-q:
       - -i DATA/mri-q/small/input/32_32_32_dataset.bin -o 32_32_32_dataset.out

@@ -162,7 +162,7 @@ class ConfigurationSpec:
             _valid_app_2 = 'false'
             _app_2 = 'dont_care'
             _input_2 = 'dont_care'
-            _app_2_short = 'dont care'
+            _app_2_short = 'dont_care'
             _ppn = "3"
 
         replacement_dict = {"NAME": pair_str + '-' + self.run_subdir + '-' + version_string,
