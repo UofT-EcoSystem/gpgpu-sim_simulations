@@ -24,6 +24,22 @@ def millify(n):
     return '{:.3f}{}'.format(n / 10 ** (3 * millidx), millnames[millidx])
 
 
+def load_stats_yamls(filename):
+    collections = yaml.load(open(filename), Loader=yaml.FullLoader)
+
+    if 'scalar' in collections:
+        for stat in collections['scalar']:
+            collections['scalar'][stat] = (re.compile(collections['scalar'][stat]), 'scalar')
+
+    if 'vector' in collections:
+        for stat in collections['vector']:
+            collections['vector'][stat] = (re.compile(collections['vector'][stat]), 'vector')
+
+    collections['scalar'].update(collections['vector'])
+
+    return collections['scalar']
+
+
 this_directory = os.path.dirname(os.path.realpath(__file__)) + "/"
 
 # *********************************************************--
@@ -69,10 +85,7 @@ options.stats_yml = common.file_option_test(options.stats_yml,
                                             os.path.join(this_directory, "stats", "example_stats.yml"),
                                             this_directory)
 
-stats_to_pull = yaml.load(open(options.stats_yml), Loader=yaml.FullLoader)
-
-for stat in stats_to_pull:
-    stats_to_pull[stat] = re.compile(stats_to_pull[stat])
+stats_to_pull = load_stats_yamls(options.stats_yml)
 
 # 3. Look for matching log files
 
@@ -185,7 +198,7 @@ for idx, app_and_args in enumerate(apps_and_args):
 
         # print "Parsing File {0}. Size: {1}".format(outfile, millify(os.stat(outfile).st_size))
         # reverse pass cuz the stats are at the bottom
-        for line in reversed(lines):
+        for line in lines:
             # If we ended simulation due to too many insn - ignore the last kernel launch, as it is no complete.
             # Note: This only appies if we are doing kernel-by-kernel stats
             last_kernel_break = re.match(
@@ -194,15 +207,21 @@ for idx, app_and_args in enumerate(apps_and_args):
                 print "NOTE::::: Found Max Insn reached in {0}.".format(outfile)
 
             for stat_name, token in stats_to_pull.iteritems():
-                existance_test = token.search(line.rstrip())
+                existance_test = token[0].search(line.rstrip())
                 if existance_test:
                     stat_found.add(stat_name)
                     number = existance_test.group(1).strip()
                     number = number.replace(',', 'x') # avoid conflicts with csv commas
-                    stat_map[app_and_args + config + stat_name] = number
 
-            if (len(stat_found) == len(stats_to_pull)):
-                break
+                    if token[1] == 'scalar':
+                        stat_map[app_and_args + config + stat_name] = number
+                    else:
+                        if app_and_args + config + stat_name not in stat_map:
+                            stat_map[app_and_args + config + stat_name] = [number]
+                        else:
+                            stat_map[app_and_args + config + stat_name].append(number)
+
+        f.close()
 
 # print out the csv file
 print('-'*100)
@@ -225,7 +244,10 @@ with open(options.logfile, 'w+') as f:
 
             for stat in stats_list:
                 if app_str + config + stat in stat_map:
-                    csv_str += ',' + stat_map[app_str + config + stat]
+                    if stats_to_pull[stat][1] == 'scalar':
+                        csv_str += ',' + stat_map[app_str + config + stat]
+                    else:
+                        csv_str += ',[' + ' '.join(stat_map[app_str + config + stat]) + ']'
                 else:
                     csv_str += ',' + '0'
 
