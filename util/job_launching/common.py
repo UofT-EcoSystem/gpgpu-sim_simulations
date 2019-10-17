@@ -83,7 +83,7 @@ def parse_pair_file(pair_file):
     with open(pair_file) as pf:
         for line in pf:
             strip_line = line.strip().strip('\n')
-            if not strip_line:
+            if not strip_line or strip_line.startswith('#'):
                 # empty line
                 continue
 

@@ -227,7 +227,7 @@ with open(options.logfile, 'w+') as f:
                 if app_str + config + stat in stat_map:
                     csv_str += ',' + stat_map[app_str + config + stat]
                 else:
-                    csv_str += ','
+                    csv_str += ',' + '0'
 
             f.write(csv_str + '\n')
             print(csv_str)
