@@ -31,7 +31,7 @@
   'l1D_miss_rate': 'L1D_total_cache_miss_rate\s*=\s*(.*)'
   'l2_miss_rate': 'L2_total_cache_miss_rate\s*=\s*(.*)'
   'runtime': 'gpu_tot_sim_cycle\s*=\s*(.*)'
-  'l2_rshr_entry_fail':'L2_cache_stats_fail_breakdown\[GLOBAL_ACC_R\]\[MSHR_ENRTY_FAIL\]\s*=*\s(.*)'
-  'l2_rshr_merge_fail':'L2_cache_stats_fail_breakdown\[GLOBAL_ACC_R\]\[MSHR_MERGE_ENRTY_FAIL\]\s*=\s*(.*)'
+  'l2_rshr_entry_fail': 'L2_cache_stats_fail_breakdown\[GLOBAL_ACC_R\]\[MSHR_ENRTY_FAIL\]\s*=*\s(.*)'
+  'l2_rshr_merge_fail': 'L2_cache_stats_fail_breakdown\[GLOBAL_ACC_R\]\[MSHR_MERGE_ENRTY_FAIL\]\s*=\s*(.*)'
 'vector':
   'dram_bw': 'bwutil\s*=\s*(.*)'

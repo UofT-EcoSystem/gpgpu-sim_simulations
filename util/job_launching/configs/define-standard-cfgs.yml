@@ -43,15 +43,32 @@ FLUSHL1:
 PWR_ENABLE:
     extra_params: "-power_simulation_enabled 1"
 
-# playing with occupancy versus eligibility
-1S4:
-    extra_params: "-gpgpu_shader_core_pipeline 512:32 -gpgpu_shader_cta 8"
-2S4:
-    extra_params: "-gpgpu_shader_core_pipeline 1024:32 -gpgpu_shader_cta 16"
-3S4:
-    extra_params: "-gpgpu_shader_core_pipeline 1536:32 -gpgpu_shader_cta 24"
-4S4:
-    extra_params: "-gpgpu_shader_core_pipeline 2048:32 -gpgpu_shader_cta 32"
+# sweeping ctas
+12CTA:
+    extra_params: "-gpgpu_shader_cta 12"
+11CTA:
+    extra_params: "-gpgpu_shader_cta 11"
+10CTA:
+    extra_params: "-gpgpu_shader_cta 10"
+9CTA:
+  extra_params: "-gpgpu_shader_cta 9"
+8CTA:
+  extra_params: "-gpgpu_shader_cta 8"
+7CTA:
+  extra_params: "-gpgpu_shader_cta 7"
+6CTA:
+  extra_params: "-gpgpu_shader_cta 6"
+5CTA:
+  extra_params: "-gpgpu_shader_cta 5"
+4CTA:
+  extra_params: "-gpgpu_shader_cta 4"
+3CTA:
+  extra_params: "-gpgpu_shader_cta 3"
+2CTA:
+  extra_params: "-gpgpu_shader_cta 2"
+1CTA:
+  extra_params: "-gpgpu_shader_cta 1"
+
 
 # Experimental - for SM 60 PTXplus support
 PTXPLUS_SM6:
