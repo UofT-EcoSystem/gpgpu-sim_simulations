@@ -69,6 +69,8 @@ PWR_ENABLE:
 1CTA:
   extra_params: "-gpgpu_shader_cta 1"
 
+BYPASS_L2:
+  extra_params: "-gpgpu_cache:dl2 none"
 
 # Experimental - for SM 60 PTXplus support
 PTXPLUS_SM6:
