@@ -72,6 +72,9 @@ PWR_ENABLE:
 BYPASS_L2:
   extra_params: "-gpgpu_cache:dl2 none"
 
+BYPASS_L2D_S1:
+  extra_params: "-l2d_enabled 1:0:1"
+
 # Experimental - for SM 60 PTXplus support
 PTXPLUS_SM6:
     extra_params: "-gpgpu_ptx_convert_to_ptxplus 1 -gpgpu_ptx_force_max_capability 62 -gpgpu_ptx_force_min_capability 60"
