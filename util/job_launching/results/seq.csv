@@ -1,8 +1,0 @@
-pair_str,config,gpusim_version,jobId,grid_x,grid_y,grid_z,block_x,block_y,block_z,ctas/SM,runtime,instructions,avg_mem_lat,avg_core_to_l2,avg_l2_to_core,avg_mrq_latency,stall_core_ldst,stall_icnt_to_l2,l2_rshr_entry_fail,l2_rshr_merge_fail,stall_l2_to_icnt,l1D_miss_rate,l2_miss_rate
-cut_sgemm-0,TITANV,commit_d5192_modified_1,121,16,8,1,256,1,1,2,91668,228392960,315,150,22,6,533851,29294,0,15872,0,1.0000,0.5466
-parb_stencil-0,TITANV,commit_d5192_modified_1,124,8,128,1,32,4,1,16,334891,644994210,1277,694,20,170,3967052,7185027,0,0,0,1.0000,0.7651
-parb_sgemm-0,TITANV,commit_d5192_modified_1,123,8,66,1,16,8,1,11,654458,2800545792,223,32,11,15,7394252,3988,0,2057410,0,0.9203,0.1445
-parb_lbm-0,TITANV,commit_d5192_modified_1,125,120,150,1,120,1,1,12,929616,427778603,21834,21115,58,187,8562524,18252425,27841,0,0,1.0000,0.9996
-parb_spmv-0,TITANV,commit_d5192_modified_1,126,1147,1,1,128,1,1,16,73031,52720795,796,241,15,76,2699406,1013709,22,69,0,0.5358,0.8571
-parb_cutcp-0,TITANV,commit_d5192_modified_1,127,11,11,1,8,2,8,16,525052,7055002292,154,22,7,6,1956570,6420,0,0,0,1.0000,0.0453
-cut_wmma-0,TITANV,commit_d5192_modified_1,122,16,8,1,64,1,1,4,62335,36372480,836,704,8,8,848784,12340,0,0,0,0.9957,0.1275
