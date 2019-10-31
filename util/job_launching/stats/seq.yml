@@ -14,6 +14,7 @@
   'avg_mrq_latency': 'avg_mrq_latency\[1\]\s*=\s*(.*)'
   'stall_core_ldst': 'gpgpu_n_stall_shd_mem\s*=\s*(.*)'
   'stall_icnt_to_l2': 'gpu_stall_dramfull\s*=\s*(.*)'
+  'l2_BW': 'L2_BW\s*=\s*(.*)\s*GB/Sec'
   'l2_rshr_entry_fail': 
     'L2_cache_stats_fail_breakdown\[GLOBAL_ACC_R\]\[MSHR_ENRTY_FAIL\]\s*=*\s(.*)'
   'l2_rshr_merge_fail':
