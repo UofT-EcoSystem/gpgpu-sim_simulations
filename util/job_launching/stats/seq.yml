@@ -31,6 +31,7 @@
   'inject_in': '\[1,1\]Injected\spacket\srate\saverage\s=\s(.*)'
   'accepted_in': '\[1,1\]Accepted\spacket\srate\saverage\s=\s(.*)'
 'vector':
-  'dram_bw': 'dram_eff=(.*)$'
+  'dram_eff': 'dram_eff=(.*)$'
+  'dram_bw': 'bw_util=(.*)$'
   'row_buffer_locality': 'Row_Buffer_Locality\s*=\s*(.*)'
   'mrqq': 'mrqq:\s*.*avg=(.*)'
