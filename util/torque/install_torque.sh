@@ -8,7 +8,7 @@ fi
 echo "Installing torque and configure server to have $1 cores."
 
 # torque SERVER setup
-sudo apt update && sudo apt install torque-server torque-scheduler torque-client
+sudo apt update && sudo apt -y install torque-server torque-scheduler torque-client
 
 # torque SERVER setup
 hostname | sudo tee /var/spool/torque/server_name
@@ -31,6 +31,6 @@ echo "`hostname` np=$1" | sudo tee -a /var/spool/torque/server_priv/nodes
 
 
 # torque CLIENT setup
-sudo apt update && sudo apt install torque-client torque-mom
+sudo apt update && sudo apt install -y torque-client torque-mom
 
 echo "pbs_server = `hostname`" | sudo tee /var/spool/torque/mom_priv/config
