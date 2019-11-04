@@ -78,6 +78,9 @@ BYPASS_L2D_S1:
 NO_RW_TURNAROUND:
   extra_params: "-Elimnate_rw_turnaround"
 
+SEP_RW:
+  extra_params: "-Seperate_Write_Queue_Enable -Write_Queue_Size 64:56:16"
+
 # Experimental - for SM 60 PTXplus support
 PTXPLUS_SM6:
     extra_params: "-gpgpu_ptx_convert_to_ptxplus 1 -gpgpu_ptx_force_max_capability 62 -gpgpu_ptx_force_min_capability 60"
