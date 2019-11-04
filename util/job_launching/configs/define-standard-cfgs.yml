@@ -75,8 +75,8 @@ BYPASS_L2:
 BYPASS_L2D_S1:
   extra_params: "-l2d_enabled 1:0:1"
 
-ICNT_CLK_2X:
-  extra_params: "-gpgpu_clock_domains 1200.0:2400.0:1200.0:850.0"
+NO_RW_TURNAROUND:
+  extra_params: "-Elimnate_rw_turnaround"
 
 # Experimental - for SM 60 PTXplus support
 PTXPLUS_SM6:
