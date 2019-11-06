@@ -34,8 +34,24 @@
     'partiton_level_parallism_total\s*=\s*(.*)'
   'mem_subpartition_parallism_util': 
     'partiton_level_parallism_util_total\s*=\s*(.*)'
+  'L2_reservation_fail':
+    'L2_total_cache_reservation_fails\s=\s(.*)'
 'vector':
   'dram_eff': 'dram_eff=(.*)$'
   'dram_bw': 'bw_util=(.*)$'
   'row_buffer_locality': 'Row_Buffer_Locality\s*=\s*(.*)'
   'mrqq': 'mrqq:\s*.*avg=(.*)'
+  'total_cmd':
+    'total_CMD\s=\s(.*)'
+  'wasted_col':
+    'Wasted_Col\s=\s(.*)'
+  'wasted_row':
+    'Wasted_Row\s=\s(.*)'
+  'mem_idle':
+    'Idle\s=\s(.*)'
+  'CCDLc':
+    'CCDLc_limit_alone\s=\s(.*)'
+  'WTRc':
+    'WTRc_limit_alone\s=\s(.*)'
+  'RTWc':
+    'RTWc_limit_alone\s=\s(.*)'
