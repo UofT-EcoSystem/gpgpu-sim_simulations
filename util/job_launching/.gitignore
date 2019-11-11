@@ -3,3 +3,4 @@ logfiles
 *.pdf
 *.png
 .ipynb_checkpoints
+default.pair
