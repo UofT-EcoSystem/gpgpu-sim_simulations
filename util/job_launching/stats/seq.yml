@@ -55,3 +55,7 @@
     'WTRc_limit_alone\s=\s(.*)'
   'RTWc':
     'RTWc_limit_alone\s=\s(.*)'
+  'RCDc':
+    'RCDc_limit\s=\s(.*)'
+  'RCDWRc':
+    'RCDWRc_limit\s=\s(.*)'
