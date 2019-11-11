@@ -64,8 +64,10 @@ parser.add_option("-N", "--sim_name", dest="sim_name",
 parser.add_option("-S", "--stats_yml", dest="stats_yml", default="",
                   help="The yaml file that defines the stats you want to collect." + \
                        " by default it uses stats/example_stats.yml")
+parser.add_option("-L", "--log_dir", dest="log_dir", default="",
+                  help="Directory of logfiles")
 
-parser.add_option("-l", "--log", dest="logfile", default="result.csv",
+parser.add_option("-o", "--output", dest="outfile", default="result.csv",
         help="The logfile to save csv to.")
 
 
@@ -89,7 +91,7 @@ stats_to_pull = load_stats_yamls(options.stats_yml)
 
 # 3. Look for matching log files
 
-logfiles_directory = this_directory + "../job_launching/logfiles/"
+logfiles_directory = options.log_dir
 
 if not os.path.exists(logfiles_directory):
     exit("Default logfile directory cannot be found")
@@ -228,7 +230,7 @@ print('-'*100)
 # just to make sure we print the stats in deterministic order, store keys of the map into a stats_list
 stats_list = stats_to_pull.keys()
 
-with open(options.logfile, 'w+') as f:
+with open(options.outfile, 'w+') as f:
     f.write('pair_str,config,gpusim_version,jobId,' + ','.join(stats_list) + '\n')
     print('pair_str,config,gpusim_version,jobId,' + ','.join(stats_list))
 
@@ -255,7 +257,7 @@ with open(options.logfile, 'w+') as f:
             print(csv_str)
 
 
-print("Write to file {0}".format(options.logfile))
+print("Write to file {0}".format(options.outfile))
 print('-'*100)
 
 duration = time.time() - start_time
