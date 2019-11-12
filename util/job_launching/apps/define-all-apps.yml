@@ -16,8 +16,10 @@ cutlass:
   execs:
     - cut_sgemm:
       - 2048 1024 64
+      - 4096 2048 512
     - cut_wmma:
       - 1024 512 512
+      - 4096 1024 4096
 
 
 parboil:
