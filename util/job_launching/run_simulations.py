@@ -46,15 +46,16 @@ class ConfigurationSpec:
     # Public Interface methods
     #########################################################################################
     # Class is constructed with a single line of text from the sweep_param file
-    def __init__(self, ( name, params, config_file )):
+    def __init__(self, xxx_todo_changeme):
+        ( name, params, config_file ) = xxx_todo_changeme
         self.run_subdir = name
         self.params = params
         self.config_file = config_file
 
     def my_print(self):
-        print "Run Subdir = " + self.run_subdir
-        print "Parameters = " + self.params
-        print "Base config file = " + self.config_file
+        print("Run Subdir = " + self.run_subdir)
+        print("Parameters = " + self.params)
+        print("Base config file = " + self.config_file)
 
     def run(self, version_string, benchmarks, options):
         for pair in benchmarks:
@@ -84,7 +85,7 @@ class ConfigurationSpec:
                     torque_out_file.seek(0)
                     torque_out = re.sub(r"(^\d+).*", r"\1",
                                         torque_out_file.read().strip())
-                    print("Job " + torque_out + " queued (" + pair_str + ", " + self.run_subdir + ")")
+                    print(("Job " + torque_out + " queued (" + pair_str + ", " + self.run_subdir + ")"))
                 torque_out_file.close()
                 os.remove(torque_out_filename)
                 os.chdir(saved_dir)
@@ -105,12 +106,12 @@ class ConfigurationSpec:
                     logfile = open(this_directory + \
                                    "logfiles/" + log_name + "." + \
                                    day_string + ".txt", 'a')
-                    print >> logfile, "%s %6s %-22s %-25s %s" % \
+                    print("%s %6s %-22s %-25s %s" % \
                                       (time_string,
                                        torque_out,
                                        pair_str,
                                        self.run_subdir,
-                                       version_string)
+                                       version_string), file=logfile)
                     logfile.close()
 
     #########################################################################################
@@ -234,7 +235,7 @@ if not os.path.isdir(options.run_directory):
     try:
         os.makedirs(options.run_directory)
     except:
-        print("Failed to create run directory %s" % options.run_directory)
+        print(("Failed to create run directory %s" % options.run_directory))
         exit(1)
 
 # 2. Copy .so file into run dir
@@ -270,9 +271,9 @@ configurations = []
 for config in cfgs:
     configurations.append(ConfigurationSpec(config))
 
-print("Running Simulations with GPGPU-Sim built from \n{0}\n ".format(version_string) +
+print(("Running Simulations with GPGPU-Sim built from \n{0}\n ".format(version_string) +
       "\nUsing configs: " + options.configs_list +
-      "\nBenchmark: " + options.benchmark_list)
+      "\nBenchmark: " + options.benchmark_list))
 
 for config in configurations:
     config.my_print()

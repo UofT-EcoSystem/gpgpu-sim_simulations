@@ -114,7 +114,7 @@ if len(named_sim) == 0:
 # Sort sim log files based on modification time so that new app + config pair will override the old one
 named_sim.sort(key=os.path.getmtime)
 
-print "Using logfiles " + str(named_sim)
+print("Using logfiles " + str(named_sim))
 
 # 4. Parse log files
 configs = set()
@@ -143,7 +143,7 @@ for idx, app_and_args in enumerate(apps_and_args):
         # now get the right output file
         output_dir = os.path.join(options.run_dir, app_and_args, config)
         if not os.path.isdir(output_dir):
-            print("WARNING the outputdir " + output_dir + " does not exist")
+            print(("WARNING the outputdir " + output_dir + " does not exist"))
             continue
 
         jobId = -1
@@ -156,7 +156,7 @@ for idx, app_and_args in enumerate(apps_and_args):
             outfile = os.path.join(output_dir, jobname + "." + "o" + jobId)
 
         if not os.path.isfile(outfile):
-            print "WARNING - " + outfile + " does not exist"
+            print("WARNING - " + outfile + " does not exist")
             continue
 
         stat_map[app_and_args + config + 'gpusim_version'] = gpusim_version
@@ -188,7 +188,7 @@ for idx, app_and_args in enumerate(apps_and_args):
         f.close()
 
         if not exit_success:
-            print "Detected that {0} does not contain a terminating string from GPGPU-Sim. Skip.".format(outfile)
+            print("Detected that {0} does not contain a terminating string from GPGPU-Sim. Skip.".format(outfile))
             continue
 
         stat_found = set()
@@ -206,9 +206,9 @@ for idx, app_and_args in enumerate(apps_and_args):
             last_kernel_break = re.match(
                 r"GPGPU-Sim: \*\* break due to reaching the maximum cycles \(or instructions\) \*\*", line)
             if last_kernel_break:
-                print "NOTE::::: Found Max Insn reached in {0}.".format(outfile)
+                print("NOTE::::: Found Max Insn reached in {0}.".format(outfile))
 
-            for stat_name, token in stats_to_pull.iteritems():
+            for stat_name, token in stats_to_pull.items():
                 existance_test = token[0].search(line.rstrip())
                 if existance_test:
                     stat_found.add(stat_name)
@@ -226,13 +226,13 @@ for idx, app_and_args in enumerate(apps_and_args):
         f.close()
 
 # print out the csv file
-print('-'*100)
+print(('-'*100))
 # just to make sure we print the stats in deterministic order, store keys of the map into a stats_list
-stats_list = stats_to_pull.keys()
+stats_list = list(stats_to_pull.keys())
 
 with open(options.outfile, 'w+') as f:
     f.write('pair_str,config,gpusim_version,jobId,' + ','.join(stats_list) + '\n')
-    print('pair_str,config,gpusim_version,jobId,' + ','.join(stats_list))
+    print(('pair_str,config,gpusim_version,jobId,' + ','.join(stats_list)))
 
     for app_str in apps_and_args:
         for config in configs:
@@ -257,11 +257,11 @@ with open(options.outfile, 'w+') as f:
             print(csv_str)
 
 
-print("Write to file {0}".format(options.outfile))
-print('-'*100)
+print(("Write to file {0}".format(options.outfile)))
+print(('-'*100))
 
 duration = time.time() - start_time
 
-print"Script exec time {0:.2f} seconds. {1} files and {2}B parsed. {3}B/s". \
+print("Script exec time {0:.2f} seconds. {1} files and {2}B parsed. {3}B/s". \
     format(duration, files_parsed, millify(bytes_parsed),
-           millify(float(bytes_parsed) / float(duration)))
+           millify(float(bytes_parsed) / float(duration))))
