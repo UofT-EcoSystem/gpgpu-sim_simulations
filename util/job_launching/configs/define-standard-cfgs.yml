@@ -43,31 +43,15 @@ FLUSHL1:
 PWR_ENABLE:
     extra_params: "-power_simulation_enabled 1"
 
+CONCURRENT:
+  extra_params: "-gpgpu_concurrent_kernel_sm 1"
+
 # sweeping ctas
-12CTA:
-    extra_params: "-gpgpu_shader_cta 12"
-11CTA:
-    extra_params: "-gpgpu_shader_cta 11"
-10CTA:
-    extra_params: "-gpgpu_shader_cta 10"
-9CTA:
-  extra_params: "-gpgpu_shader_cta 9"
-8CTA:
-  extra_params: "-gpgpu_shader_cta 8"
-7CTA:
-  extra_params: "-gpgpu_shader_cta 7"
-6CTA:
-  extra_params: "-gpgpu_shader_cta 6"
-5CTA:
-  extra_params: "-gpgpu_shader_cta 5"
-4CTA:
-  extra_params: "-gpgpu_shader_cta 4"
-3CTA:
-  extra_params: "-gpgpu_shader_cta 3"
-2CTA:
-  extra_params: "-gpgpu_shader_cta 2"
-1CTA:
-  extra_params: "-gpgpu_shader_cta 1"
+INTRA_?_CTA:
+  extra_params: "-gpgpu_sharing_intra_sm 1 -max_cta_in_stream ?"
+
+INTER_?_SM:
+  extra_params: "-gpgpu_sharing_intra_sm 0 -inter_sm_resource_ratio ?"
 
 BYPASS_L2:
   extra_params: "-gpgpu_cache:dl2 none -gpgpu_cache:il1 N:64:128:16,L:R:f:N:L,A:2:48,4 -gpgpu_const_cache:l1 N:128:64:8,L:R:f:N:L,A:2:64,4"
@@ -81,8 +65,8 @@ NO_RW_TURNAROUND:
 SEP_RW:
   extra_params: "-Seperate_Write_Queue_Enable 1 -Write_Queue_Size 64:56:16"
 
-PARTITION_L2:
-  extra_params: "-l2_partition_enabled 1 -l2_partition 0:0.5:0.5"
+PARTITION_L2_?:
+  extra_params: "-l2_partition_enabled 1 -l2_partition ?"
 
 # Experimental - for SM 60 PTXplus support
 PTXPLUS_SM6:
