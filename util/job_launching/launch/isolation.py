@@ -43,9 +43,9 @@ for app in args.apps:
 
     base_config = "TITANV-SEP_RW-CONCURRENT"
     intra_sm = [ "INTRA_0:{0}:0_CTA".format(i) 
-                 for i in range(1, app_df.loc[app, 'achieved_cta']) ]
+                 for i in range(1, app_df.loc[app, 'achieved_cta']+1) ]
     inter_sm = [ "INTER_0:{0}:0_SM".format(i)
-                 for i in range(1, app_df.loc[app, 'achieved_sm'])] 
+                 for i in range(8, app_df.loc[app, 'achieved_sm']+1, 8)] 
 
     l2_fract = [0.125, 0.25, 0.5, 1.0]
     l2_partition = ["PARTITION_L2_0:{0}:{1}".format(f, 1-f) for f in l2_fract]

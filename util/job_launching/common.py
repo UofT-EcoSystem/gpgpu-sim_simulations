@@ -1,4 +1,3 @@
-
 from optparse import OptionParser
 import subprocess
 import re
@@ -9,95 +8,54 @@ import hashlib
 
 this_directory = os.path.dirname(os.path.realpath(__file__)) + "/"
 
+# Global variables
 defined_apps = {}
-defined_baseconfigs = {}
-defined_xtracfgs = {}
-
-def get_argfoldername( args ):
-    if args == "" or args == None:
-        return "NO_ARGS"
-    else:
-        foldername = re.sub(r"[^a-z^A-Z^0-9]", "_", str(args).strip())
-        # For every long arg lists - create a hash of the input args
-        if len(str(args)) > 256:
-            foldername = "hashed_args_" + hashlib.md5(args).hexdigest()
-        return foldername
-
-# Test to see if the passed config adheres to any defined configs and add it to the configrations to run/collect.
-def get_config(name, defined_baseconfigs, defined_xtracfgs):
-    tokens = name.split('-')
-    if tokens[0] not in defined_baseconfigs:
-        print("Could not fined {0} in defined basenames {1}".format(tokens[0], defined_baseconfigs))
-        return None
-    else:
-        config = (name, "", defined_baseconfigs[tokens[0]])
-    for token in tokens[1:]:
-        if token not in defined_xtracfgs:
-            print("Could not find {0} in defined xtraconfigs {1}".format(token, defined_xtracfgs))
-            return None
-        else:
-            oldName, oldXtra, oldBasename = config
-            config = \
-                (oldName, oldXtra + "\n#{0}\n{1}\n".format(token, defined_xtracfgs[token]), oldBasename)
-    return config
+defined_base_configs = {}
+defined_extra_configs = {}
 
 
 def load_defined_yamls():
+    def parse_app_definition_yaml(def_yml):
+        benchmark_yaml = yaml.load(open(def_yml), Loader=yaml.FullLoader)
+        for suite in benchmark_yaml:
+            for exe in benchmark_yaml[suite]['execs']:
+                exe_name = list(exe.keys())[0]
+                args_list = list(exe.values())[0]
+
+                # replace data dir in args list with real path
+                args_list = [args.replace("DATA", benchmark_yaml[suite]['data_dirs']) if args else "" for args in
+                             args_list]
+
+                count = 0
+                for args in args_list:
+                    defined_apps[exe_name + "-" + str(count)] = (exe_name, args)
+                    count += 1
+        return
+
+    def parse_config_definition_yaml(def_yml):
+        configs_yaml = yaml.load(open(def_yml), Loader=yaml.FullLoader)
+        for config in configs_yaml:
+            if 'base_file' in configs_yaml[config]:
+                defined_base_configs[config] = os.path.expandvars(configs_yaml[config]['base_file'])
+            elif 'extra_params' in configs_yaml[config]:
+                # extra configs map store (regex -> params in text)
+                defined_extra_configs[re.compile(config.replace('?', '(.*)'))] = configs_yaml[config]['extra_params']
+        return
+
     define_yamls = glob.glob(os.path.join(this_directory, 'apps/define-*.yml'))
     for def_yaml in define_yamls:
-        parse_app_definition_yaml( os.path.join(this_directory, 'apps', def_yaml), defined_apps)
+        parse_app_definition_yaml(os.path.join(this_directory, 'apps', def_yaml))
     define_yamls = glob.glob(os.path.join(this_directory, 'configs/define-*.yml'))
     for def_yaml in define_yamls:
-        parse_config_definition_yaml( os.path.join(this_directory, 'configs', def_yaml), defined_baseconfigs, defined_xtracfgs )
+        parse_config_definition_yaml(os.path.join(this_directory, 'configs', def_yaml))
 
 
-def parse_app_definition_yaml( def_yml, apps ):
-    benchmark_yaml = yaml.load(open(def_yml), Loader=yaml.FullLoader)
-    for suite in benchmark_yaml:
-        for exe in benchmark_yaml[suite]['execs']:
-            exe_name = list(exe.keys())[0]
-            args_list = list(exe.values())[0]
+def parse_app_list(apps):
+    # result is a two dimensional list: [[app1, app2], [app3], ...]
+    results = apps.split(',')
+    results = [pair.split('+') for pair in results]
 
-            # replace data dir in args list with real path
-            args_list = [args.replace("DATA", benchmark_yaml[suite]['data_dirs']) if args else "" for args in args_list]
-                
-            count = 0
-            for args in args_list:
-                apps[ exe_name + "-" + str(count) ] = (exe_name, args)
-                count += 1
-    return
-
-
-def parse_config_definition_yaml( def_yml, defined_baseconfigs, defined_xtracfgs ):
-    configs_yaml = yaml.load(open( def_yml ), Loader=yaml.FullLoader)
-    for config in configs_yaml:
-        if 'base_file' in configs_yaml[config]:
-            defined_baseconfigs[config] = os.path.expandvars(configs_yaml[config]['base_file'])
-        elif 'extra_params' in configs_yaml[config]:
-            defined_xtracfgs[config] = configs_yaml[config]['extra_params']
-    return
-
-
-def parse_pair_file(pair_file):
-    pairs = []
-    with open(pair_file) as pf:
-        for line in pf:
-            strip_line = line.strip().strip('\n')
-            if not strip_line or strip_line.startswith('#'):
-                # empty line
-                continue
-
-            kernel_pair = strip_line.split(',')
-            kernel_pair = [k.strip() for k in kernel_pair]
-
-            if len(kernel_pair) < 1 or len(kernel_pair) > 2:
-                print("Error, we only only running one or two kernels for each run. Current run:")
-                print(kernel_pair)
-                exit(1)
-
-            pairs.append(kernel_pair)
-
-    return pairs
+    return results
 
 
 def get_inputs_from_app(app):
@@ -107,25 +65,46 @@ def get_inputs_from_app(app):
         return ''
 
 
-def gen_configs_from_list( cfg_list ):
-    configs = []
+def gen_configs_from_list(input_config):
+    # config_list: [config1, config2, ...]
+    config_list = input_config.split(',')
 
-    for cfg in cfg_list:
-        configs.append(get_config(cfg, defined_baseconfigs, defined_xtracfgs))
-    return configs
+    # Test to see if configs passed by users adhere to any defined configs i
+    # and add them to the configurations to run/collect.
+    def get_config(composed_name):
+        tokens = composed_name.split('-')
 
-def get_cuda_version(this_directory):
-    # Get CUDA version
-    nvcc_out_filename = os.path.join( this_directory, "nvcc_out.{0}.txt".format(os.getpid()) )
-    nvcc_out_file = open(nvcc_out_filename, 'w+')
-    subprocess.call(["nvcc", "--version"],\
-                   stdout=nvcc_out_file)
-    nvcc_out_file.seek(0)
-    cuda_version = re.sub(r".*release (\d+\.\d+).*", r"\1", nvcc_out_file.read().strip().replace("\n"," "))
-    nvcc_out_file.close()
-    os.remove(nvcc_out_filename)
-    os.environ['CUDA_VERSION'] = cuda_version
-    return cuda_version
+        # base name determines which gpgpusim.config file to copy
+        if tokens[0] not in defined_base_configs:
+            print("Could not fined {0} in defined base names {1}".format(tokens[0], defined_base_configs))
+            return None
+        else:
+            base_file = defined_base_configs[tokens[0]]
+
+        # parse extra configs if any
+        extra_config_text = ''
+        found = False
+        for token in tokens[1:]:
+            for config_regex in defined_extra_configs.keys():
+                matching = config_regex.search(token)
+                if matching:
+                    found = True
+                    placeholder = matching.group(1).strip() if len(matching.groups()) > 1 else ''
+                    extra_config_text += \
+                        "\n#{0}\n{1}\n".format(token, defined_extra_configs[config_regex].replace('?', placeholder))
+
+                    break
+
+            if not found:
+                print("Could not find {0} in defined extra configs {1}".format(token, defined_extra_configs))
+                return None
+
+        return composed_name, base_file, extra_config_text
+
+    results = [get_config(cfg) for cfg in config_list]
+
+    return results
+
 
 # This function exists so that this file can accept both absolute and relative paths
 # If no name is provided it sets the default
@@ -137,14 +116,17 @@ def file_option_test(name, default, this_directory):
         else:
             name = os.path.join(this_directory, default)
     try:
-        with open(name): pass
+        with open(name):
+            pass
     except IOError:
         name = os.path.join(os.getcwd(), name)
         try:
-            with open(name): pass
+            with open(name):
+                pass
         except IOError:
             exit("Error - cannot open file {0}".format(name))
     return name
+
 
 def dir_option_test(name, default, this_directory):
     if name == "":
@@ -155,47 +137,34 @@ def dir_option_test(name, default, this_directory):
             exit("Error - cannot open file {0}".format(name))
     return name
 
-def parse_run_simulations_options():
-    parser = OptionParser()
-    parser.add_option("-B", "--benchmark_list", dest="benchmark_list",
-                  help="A file with all benchmark pairs to run. See apps/define-*.yml for " +\
-                        "the benchmark suite names.",
-                  default="apps/default.pair")
-    parser.add_option("-C", "--configs_list", dest="configs_list",
-                  help="a comma seperated list of configs to run. See configs/define-*.yml for " +\
-                        "the config names.",
-                  default="GTX480")
-    parser.add_option("-E", "--benchmark-root", dest="benchmark_root",
-                  help="ABSOLUTE path of the benchmarkv2 root directory.",
-                  default="/mnt/GPU-Virtualization-Benchmarks/benchmarksv2/")
-    parser.add_option("-p", "--benchmark_exec_prefix", dest="benchmark_exec_prefix",
-                 help="When submitting the job to torque this string" +\
-                 " is placed before the command line that runs the benchmark. " +\
-                 " Useful when wanting to run valgrind.", default="")
-    parser.add_option("-r", "--run_directory", dest="run_directory",
-                  help="ABSOLUTE path of the directory in which to run simulations",
-                  default=""),
-    parser.add_option("-n", "--no_launch", dest="no_launch", action="store_true",
-                  help="When set, no torque jobs are launched.  However, all"+\
-                  " the setup for running is performed. ie, the run"+\
-                  " directories are created and are ready to run."+\
-                  " This can be useful when you want to create a new" +\
-                  " configuration, but want to test it locally before "+\
-                  " launching a bunch of jobs.")
-    parser.add_option("-s", "--so_dir", dest="so_dir",
-                  help="Point this to the directory that your .so is stored in. If nothing is input here - "+\
-                       "the scripts will assume that you are using the so built in GPGPUSIM_ROOT.",
-                       default="")
-    parser.add_option("-N", "--launch_name", dest="launch_name", default="",
-                  help="Pass if you want to name the launch. This will determine the name of the logfile.\n" +\
-                       "If you do not name the file, it will just use the current date/time.")
-    
-    (options, args) = parser.parse_args()
-    # Parser seems to leave some whitespace on the options, getting rid of it
-    options.configs_list = options.configs_list.strip()
-    options.benchmark_exec_prefix = options.benchmark_exec_prefix.strip()
-    options.benchmark_list = options.benchmark_list.strip()
-    options.run_directory = options.run_directory.strip()
-    options.so_dir = options.so_dir.strip()
-    options.launch_name = options.launch_name.strip()
-    return (options, args)
+
+# def get_argfoldername(args):
+#     if args == "" or args == None:
+#         return "NO_ARGS"
+#     else:
+#         foldername = re.sub(r"[^a-z^A-Z^0-9]", "_", str(args).strip())
+#         # For every long arg lists - create a hash of the input args
+#         if len(str(args)) > 256:
+#             foldername = "hashed_args_" + hashlib.md5(args).hexdigest()
+#         return foldername
+
+# def parse_pair_file(pair_file):
+#     pairs = []
+#     with open(pair_file) as pf:
+#         for line in pf:
+#             strip_line = line.strip().strip('\n')
+#             if not strip_line or strip_line.startswith('#'):
+#                 # empty line
+#                 continue
+#
+#             kernel_pair = strip_line.split(',')
+#             kernel_pair = [k.strip() for k in kernel_pair]
+#
+#             if len(kernel_pair) < 1 or len(kernel_pair) > 2:
+#                 print("Error, we only only running one or two kernels for each run. Current run:")
+#                 print(kernel_pair)
+#                 exit(1)
+#
+#             pairs.append(kernel_pair)
+#
+#     return pairs
