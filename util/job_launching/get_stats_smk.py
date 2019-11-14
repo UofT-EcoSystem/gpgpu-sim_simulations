@@ -49,8 +49,8 @@ bytes_parsed = 0
 
 parser = OptionParser()
 
-parser.add_option("-E", "--benchmark_root", dest="benchmark_root",
-                  help="The directory where the benchmark/config directories exist.", default="")
+parser.add_option("-R", "--parent_run_dir", dest="parent_run_dir",
+                  help="The directory where logfiles and run-* exist.", default="")
 parser.add_option("-N", "--launch_name", dest="launch_name",
                   help="If you are launching run_simulations.py with the \"-N\" option" + \
                        " then you can run ./job_status.py with \"-N\" and it will" + \
@@ -70,13 +70,12 @@ parser.add_option("-o", "--output", dest="outfile", default="result.csv",
 options.launch_name = options.launch_name.strip()
 
 # check if parent run dir exists under benchmark root
-parent_run_dir = os.path.join(options.benchmark_root, 'run')
-if not os.path.exists(parent_run_dir):
+if not os.path.exists(options.parent_run_dir):
     print('Benchmark root {0} does not contain a run/ folder. Exiting'.format(options.benchmark_root))
     exit(1)
 
-options.run_dir = common.get_run_dir(parent_run_dir, options.launch_name)
-options.log_dir = common.get_log_dir(parent_run_dir)
+options.run_dir = common.get_run_dir(options.parent_run_dir, options.launch_name)
+options.log_dir = common.get_log_dir(options.parent_run_dir)
 
 if not os.path.isdir(options.run_dir):
     exit(options.run_dir + " does not exist - specify the run directory where the benchmark/config dirs exist")
