@@ -4,3 +4,5 @@ logfiles
 *.png
 .ipynb_checkpoints
 default.pair
+
+env/
