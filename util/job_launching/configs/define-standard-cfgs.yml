@@ -51,7 +51,7 @@ INTRA_?_CTA:
   extra_params: "-gpgpu_sharing_intra_sm 1 -max_cta_in_stream ?"
 
 INTER_?_SM:
-  extra_params: "-gpgpu_sharing_intra_sm 0 -inter_sm_resource_ratio ?"
+  extra_params: "-gpgpu_sharing_intra_sm 0 -max_sm_in_stream ?"
 
 BYPASS_L2:
   extra_params: "-gpgpu_cache:dl2 none -gpgpu_cache:il1 N:64:128:16,L:R:f:N:L,A:2:48,4 -gpgpu_const_cache:l1 N:128:64:8,L:R:f:N:L,A:2:64,4"

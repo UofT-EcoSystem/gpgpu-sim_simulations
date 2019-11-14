@@ -89,7 +89,7 @@ def gen_configs_from_list(input_config):
                 matching = config_regex.search(token)
                 if matching:
                     found = True
-                    placeholder = matching.group(1).strip() if len(matching.groups()) > 1 else ''
+                    placeholder = matching.group(1).strip() if len(matching.groups()) > 0 else ''
                     extra_config_text += \
                         "\n#{0}\n{1}\n".format(token, defined_extra_configs[config_regex].replace('?', placeholder))
 
