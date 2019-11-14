@@ -1,4 +1,4 @@
 oyaml
-pandas
+pandas==0.24.0 
 numpy
 argparse
