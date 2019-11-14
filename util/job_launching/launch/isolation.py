@@ -67,7 +67,7 @@ for app in args.apps:
             '-E', BENCH_HOME,
             '-r', os.path.join(BENCH_HOME, 'run-'+jobname),
             '-N', jobname, 
-            '-n'],
+            ],
             stdout=subprocess.PIPE)
 
         print(p.stdout.decode("utf-8"))
