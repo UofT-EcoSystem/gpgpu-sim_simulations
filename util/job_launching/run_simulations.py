@@ -13,8 +13,6 @@ import common
 this_directory = os.path.dirname(os.path.realpath(__file__))
 
 
-
-
 def parse_run_simulations_options():
     parser = OptionParser()
     parser.add_option("-B", "--benchmark_list", dest="benchmark_list",
@@ -32,9 +30,6 @@ def parse_run_simulations_options():
                       help="When submitting the job to torque this string" + \
                            " is placed before the command line that runs the benchmark. " + \
                            " Useful when wanting to run valgrind.", default="")
-    parser.add_option("-r", "--run_directory", dest="run_directory",
-                      help="ABSOLUTE path of the directory in which to run simulations",
-                      default=""),
     parser.add_option("-n", "--no_launch", dest="no_launch", action="store_true",
                       help="When set, no torque jobs are launched.  However, all" + \
                            " the setup for running is performed. ie, the run" + \
@@ -54,11 +49,21 @@ def parse_run_simulations_options():
 
     # Parser seems to leave some whitespace on the options, getting rid of it
     options.configs_list = options.configs_list.strip()
-    options.benchmark_exec_prefix = options.benchmark_exec_prefix.strip()
     options.benchmark_list = options.benchmark_list.strip()
-    options.run_directory = options.run_directory.strip()
-    options.so_dir = options.so_dir.strip()
+    options.benchmark_root = options.benchmark_root.strip()
     options.launch_name = options.launch_name.strip()
+
+    # optional
+    options.so_dir = options.so_dir.strip()
+    options.benchmark_exec_prefix = options.benchmark_exec_prefix.strip()
+
+    # derived paths
+    parent_run_dir = os.path.join(options.benchmark_root, 'run')
+    if not os.path.exists(parent_run_dir):
+        os.makedirs(parent_run_dir)
+
+    options.run_directory = os.path.join(parent_run_dir, 'run-' + options.launch_name)
+    options.log_directory = os.path.join(parent_run_dir, 'logfiles')
 
     return options, args
 
@@ -143,12 +148,11 @@ class ConfigurationSpec:
 
             if len(torque_jobid) > 0:
                 # Dump the benchmark description to the logfile
-                log_folder = os.path.join(this_directory, "logfiles")
-                if not os.path.exists(log_folder):
+                if not os.path.exists(ConfigurationSpec.log_dir):
                     # In the very rare case that concurrent builds try to make the directory at the same time
                     # (after the test to os.path.exists -- this has actually happened...)
                     try:
-                        os.makedirs(log_folder)
+                        os.makedirs(ConfigurationSpec.log_dir)
                     except:
                         pass
 
@@ -157,7 +161,8 @@ class ConfigurationSpec:
                 time_string = now_time.strftime("%H:%M:%S")
                 log_name = "sim_log.{0}".format(ConfigurationSpec.launch_name)
 
-                with open(os.path.join(log_folder, log_name + "." + day_string + ".txt"), 'a') as logfile:
+                with open(os.path.join(ConfigurationSpec.log_dir, log_name + "." + day_string + ".txt"), 'a') \
+                        as logfile:
                     print("%s %6s %-22s %-25s %s" %
                           (time_string,
                            torque_jobid,
@@ -319,6 +324,7 @@ def main():
     ConfigurationSpec.benchmarks = benchmarks
     ConfigurationSpec.benchmark_root = options.benchmark_root
     ConfigurationSpec.run_dir = options.run_directory
+    ConfigurationSpec.log_dir = options.log_directory
     ConfigurationSpec.so_dir = options.so_dir
     ConfigurationSpec.version_string = version_string
     ConfigurationSpec.launch_name = options.launch_name
