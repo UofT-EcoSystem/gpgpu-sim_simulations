@@ -138,6 +138,13 @@ def dir_option_test(name, default, this_directory):
     return name
 
 
+def get_run_dir(parent_run_dir, launch_name):
+    return os.path.join(parent_run_dir, 'run-' + launch_name)
+
+
+def get_log_dir(parent_run_dir):
+    return os.path.join(parent_run_dir, 'logfiles')
+
 # def get_argfoldername(args):
 #     if args == "" or args == None:
 #         return "NO_ARGS"

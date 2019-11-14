@@ -62,8 +62,8 @@ def parse_run_simulations_options():
     if not os.path.exists(parent_run_dir):
         os.makedirs(parent_run_dir)
 
-    options.run_directory = os.path.join(parent_run_dir, 'run-' + options.launch_name)
-    options.log_directory = os.path.join(parent_run_dir, 'logfiles')
+    options.run_directory = common.get_run_dir(parent_run_dir, options.launch_name)
+    options.log_directory = common.get_log_dir(parent_run_dir)
 
     return options, args
 

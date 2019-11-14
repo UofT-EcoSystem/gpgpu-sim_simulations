@@ -3,8 +3,6 @@
 from optparse import OptionParser
 import re
 import os
-import subprocess
-import sys
 import common
 import math
 import oyaml as yaml
@@ -49,14 +47,12 @@ start_time = time.time()
 files_parsed = 0
 bytes_parsed = 0
 
-this_directory = os.path.dirname(os.path.realpath(__file__)) + "/"
-
 parser = OptionParser()
 
-parser.add_option("-R", "--run_dir", dest="run_dir",
+parser.add_option("-E", "--benchmark_root", dest="benchmark_root",
                   help="The directory where the benchmark/config directories exist.", default="")
-parser.add_option("-N", "--sim_name", dest="sim_name",
-                  help="If you are launchign run_simulations.py with the \"-N\" option" + \
+parser.add_option("-N", "--launch_name", dest="launch_name",
+                  help="If you are launching run_simulations.py with the \"-N\" option" + \
                        " then you can run ./job_status.py with \"-N\" and it will" + \
                        " give you the status of the latest run with that name." + \
                        " if you want older runs from this name, then just point it directly at the" + \
@@ -64,18 +60,23 @@ parser.add_option("-N", "--sim_name", dest="sim_name",
 parser.add_option("-S", "--stats_yml", dest="stats_yml", default="",
                   help="The yaml file that defines the stats you want to collect." + \
                        " by default it uses stats/example_stats.yml")
-parser.add_option("-L", "--log_dir", dest="log_dir", default="",
-                  help="Directory of logfiles")
 
 parser.add_option("-o", "--output", dest="outfile", default="result.csv",
-        help="The logfile to save csv to.")
-
+                  help="The logfile to save csv to.")
 
 # 1. Cmd parsing and sanity check
 (options, args) = parser.parse_args()
 
-options.run_dir = options.run_dir.strip()
-options.sim_name = options.sim_name.strip()
+options.launch_name = options.launch_name.strip()
+
+# check if parent run dir exists under benchmark root
+parent_run_dir = os.path.join(options.benchmark_root, 'run')
+if not os.path.exists(parent_run_dir):
+    print('Benchmark root {0} does not contain a run/ folder. Exiting'.format(options.benchmark_root))
+    exit(1)
+
+options.run_dir = common.get_run_dir(parent_run_dir, options.launch_name)
+options.log_dir = common.get_log_dir(parent_run_dir)
 
 if not os.path.isdir(options.run_dir):
     exit(options.run_dir + " does not exist - specify the run directory where the benchmark/config dirs exist")
@@ -104,12 +105,12 @@ if len(all_logfiles) == 0:
 
 named_sim = []
 for logf in all_logfiles:
-    match_str = r".*\/sim_log\.{0}\..*".format(options.sim_name)
+    match_str = r".*\/sim_log\.{0}\..*".format(options.launch_name)
     if re.match(match_str, logf):
         named_sim.append(logf)
 
 if len(named_sim) == 0:
-    exit("Could not find logfiles for job with the name \"{0}\"".format(options.sim_name))
+    exit("Could not find logfiles for job with the name \"{0}\"".format(options.launch_name))
 
 # Sort sim log files based on modification time so that new app + config pair will override the old one
 named_sim.sort(key=os.path.getmtime)
@@ -153,7 +154,7 @@ for idx, app_and_args in enumerate(apps_and_args):
             jobId, gpusim_version = specific_jobIds[app_and_args + config]
             jobname = app_and_args + '-' + config + '-' + gpusim_version
 
-            outfile = os.path.join(output_dir, jobname + "." + "o" + jobId)
+            outfile = os.path.join(output_dir, jobname + "." + jobId + '.log')
 
         if not os.path.isfile(outfile):
             print("WARNING - " + outfile + " does not exist")
@@ -164,7 +165,7 @@ for idx, app_and_args in enumerate(apps_and_args):
 
         # Do a quick 10000-line reverse pass to make sure the simualtion thread finished
         SIM_EXIT_STRING = "GPGPU-Sim: \*\*\* exit detected \*\*\*"
-        SIM_INACTIVE_STRING= "GPGPU-Sim: detected inactive GPU simulation thread"
+        SIM_INACTIVE_STRING = "GPGPU-Sim: detected inactive GPU simulation thread"
         exit_success = False
         MAX_LINES = 10000
         BYTES_TO_READ = int(250 * 1024 * 1024)
@@ -213,7 +214,7 @@ for idx, app_and_args in enumerate(apps_and_args):
                 if existance_test:
                     stat_found.add(stat_name)
                     number = existance_test.group(1).strip()
-                    number = number.replace(',', 'x') # avoid conflicts with csv commas
+                    number = number.replace(',', 'x')  # avoid conflicts with csv commas
 
                     if token[1] == 'scalar':
                         stat_map[app_and_args + config + stat_name] = number
@@ -226,7 +227,7 @@ for idx, app_and_args in enumerate(apps_and_args):
         f.close()
 
 # print out the csv file
-print(('-'*100))
+print(('-' * 100))
 # just to make sure we print the stats in deterministic order, store keys of the map into a stats_list
 stats_list = list(stats_to_pull.keys())
 
@@ -240,9 +241,9 @@ with open(options.outfile, 'w+') as f:
                 continue
 
             csv_str = app_str + ',' \
-                + config + ',' \
-                + stat_map[app_str + config + 'gpusim_version'] + ',' \
-                + stat_map[app_str + config + 'jobid']
+                      + config + ',' \
+                      + stat_map[app_str + config + 'gpusim_version'] + ',' \
+                      + stat_map[app_str + config + 'jobid']
 
             for stat in stats_list:
                 if app_str + config + stat in stat_map:
@@ -256,12 +257,11 @@ with open(options.outfile, 'w+') as f:
             f.write(csv_str + '\n')
             print(csv_str)
 
-
 print(("Write to file {0}".format(options.outfile)))
-print(('-'*100))
+print(('-' * 100))
 
 duration = time.time() - start_time
 
 print("Script exec time {0:.2f} seconds. {1} files and {2}B parsed. {3}B/s". \
-    format(duration, files_parsed, millify(bytes_parsed),
-           millify(float(bytes_parsed) / float(duration))))
+      format(duration, files_parsed, millify(bytes_parsed),
+             millify(float(bytes_parsed) / float(duration))))
