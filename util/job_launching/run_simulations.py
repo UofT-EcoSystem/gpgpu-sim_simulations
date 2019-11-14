@@ -136,12 +136,12 @@ class ConfigurationSpec:
                 exit("Error Launching Torque Job")
             else:
                 # Parse the torque output for just the numeric ID
-                torque_out = re.sub(r"(^\d+).*", r"\1", p.stdout.decode('utf-8'))
-                print(("Job " + torque_out + " queued (" + pair_str + ", " + self.config_name + ")"))
+                torque_jobid = p.stdout.decode('utf-8').strip()
+                print(("Job " + torque_jobid + " queued (" + pair_str + ", " + self.config_name + ")"))
 
             os.chdir(saved_dir)
 
-            if len(torque_out) > 0:
+            if len(torque_jobid) > 0:
                 # Dump the benchmark description to the logfile
                 log_folder = os.path.join(this_directory, "logfiles")
                 if not os.path.exists(log_folder):
@@ -160,7 +160,7 @@ class ConfigurationSpec:
                 with open(os.path.join(log_folder, log_name + "." + day_string + ".txt"), 'a') as logfile:
                     print("%s %6s %-22s %-25s %s" %
                           (time_string,
-                           torque_out,
+                           torque_jobid,
                            pair_str,
                            self.config_name,
                            ConfigurationSpec.version_string), file=logfile)
