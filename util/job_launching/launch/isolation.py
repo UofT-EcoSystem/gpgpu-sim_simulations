@@ -16,8 +16,8 @@ def parse_args():
 
     parser.add_argument('--apps', required=True, nargs='+', help="Apps to run.")
     parser.add_argument('--bench_home', default=DEFAULT_BENCH_HOME, help='Benchmark home folder.')
-    parser.add_argument('--cta_step', default=1, help='Sweeping step of CTAs/SM for intra-SM sharing.')
-    parser.add_argument('--sm_step', default=1, help='Sweeping step of SMs for inter-SM sharing.')
+    parser.add_argument('--cta_step', default=1, type=int, help='Sweeping step of CTAs/SM for intra-SM sharing.')
+    parser.add_argument('--sm_step', default=1, type=int, help='Sweeping step of SMs for inter-SM sharing.')
 
     results = parser.parse_args()
 
@@ -76,7 +76,6 @@ for app in args.apps:
                             '-B', app,
                             '-C', config_str,
                             '-E', DEFAULT_BENCH_HOME,
-                            '-r', os.path.join(DEFAULT_BENCH_HOME, 'run-' + jobname),
                             '-N', jobname,
                             ],
                            stdout=subprocess.PIPE)
