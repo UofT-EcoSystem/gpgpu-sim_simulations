@@ -11,4 +11,5 @@ sudo qmgr -c "set server default_queue=batch"
 # stop pbs_server, can be used to restart pbs server and reload node config
 sudo qterm
 
+echo "`hostname` np=$1" | sudo tee -a /var/spool/torque/server_priv/nodes
 
