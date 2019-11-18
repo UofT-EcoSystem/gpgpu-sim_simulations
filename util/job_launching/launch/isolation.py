@@ -4,10 +4,7 @@ import os
 import pandas as pd
 import numpy as np
 import sys
-
-DEFAULT_BENCH_HOME = "/mnt/GPU-Virtualization-Benchmarks/benchmarksv2"
-RUN_HOME = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
-NUM_SM = 80
+from constant import *
 
 
 def parse_args():
@@ -23,18 +20,6 @@ def parse_args():
 
     return results
 
-
-# max ctas according to resource constraints, grid size
-app_dict = {'cut_sgemm-0': [2, 128],
-            'cut_sgemm-1': [2, 512],
-            'cut_wmma-0': [4, 128],
-            'cut_wmma-1': [4, 1024],
-            'parb_sgemm-0': [11, 528],
-            'parb_cutcp-0': [16, 121],
-            'parb_stencil-0': [16, 1024],
-            'parb_lbm-0': [12, 18000],
-            'parb_spmv-0': [16, 1147],
-            }
 
 app_df = pd.DataFrame.from_dict(app_dict, orient='index',
                                 columns=['max_cta', 'grid'])
@@ -67,7 +52,8 @@ for app in args.apps:
         configs = ["-".join([base_config, sm, l2])
                    for sm in sm_config for l2 in l2_partition]
         if app in mem_intense:
-            configs = configs + [c + '-' + bypass_l2d for c in configs]
+            configs = configs + [c + '-' + bypass_l2d for c in configs \
+                    if ('L2_0:0.125' in c) or ('L2_0:0.25' in c)]
 
         config_str = ','.join(configs)
 
