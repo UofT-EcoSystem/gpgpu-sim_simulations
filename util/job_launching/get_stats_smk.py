@@ -104,7 +104,7 @@ if len(all_logfiles) == 0:
 
 named_sim = []
 for logf in all_logfiles:
-    match_str = r".*\/sim_log\.{0}\..*".format(options.launch_name)
+    match_str = r".*\/sim_log\..*\.{0}\..*".format(options.launch_name)
     if re.match(match_str, logf):
         named_sim.append(logf)
 
@@ -140,20 +140,19 @@ for logfile in named_sim:
 stat_map = {}  # map: app+config+stat -> stat_value
 for idx, app_and_args in enumerate(apps_and_args):
     for config in configs:
+        if app_and_args + config not in specific_jobIds:
+            continue
+
         # now get the right output file
         output_dir = os.path.join(options.run_dir, app_and_args, config)
         if not os.path.isdir(output_dir):
             print(("WARNING the outputdir " + output_dir + " does not exist"))
             continue
 
-        jobId = -1
-        gpusim_version = ""
+        jobId, gpusim_version = specific_jobIds[app_and_args + config]
+        jobname = app_and_args + '-' + config + '-' + gpusim_version
 
-        if app_and_args + config in specific_jobIds:
-            jobId, gpusim_version = specific_jobIds[app_and_args + config]
-            jobname = app_and_args + '-' + config + '-' + gpusim_version
-
-            outfile = os.path.join(output_dir, jobname + "." + jobId + '.log')
+        outfile = os.path.join(output_dir, jobname + "." + jobId + '.log')
 
         if not os.path.isfile(outfile):
             print("WARNING - " + outfile + " does not exist")

@@ -159,7 +159,11 @@ class ConfigurationSpec:
                 now_time = datetime.datetime.now()
                 day_string = now_time.strftime("%y.%m.%d-%A")
                 time_string = now_time.strftime("%H:%M:%S")
-                log_name = "sim_log.{0}".format(ConfigurationSpec.launch_name)
+
+                import socket
+                hostname = socket.gethostname()
+
+                log_name = "sim_log.{0}.{1}".format(hostname, ConfigurationSpec.launch_name)
 
                 with open(os.path.join(ConfigurationSpec.log_dir, log_name + "." + day_string + ".txt"), 'a') \
                         as logfile:
