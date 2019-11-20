@@ -23,6 +23,7 @@
   'stall_l2_to_icnt': 'gpu_stall_icnt2sh\s*=\s*(.*)'
   'l1D_miss_rate': 'L1D_total_cache_miss_rate\s*=\s*(.*)'
   'l2_miss_rate': 'L2_total_cache_miss_rate\s*=\s*(.*)'
+  'l2_total_accesses': 'L2_total_cache_accesses\s*=\s*(.*)'
   'packet_lat_out': '\[0,1\]Packet\slatency\saverage\s=\s(.*)'
   'network_lat_out': '\[0,1\]Network\slatency\saverage\s=\s(.*)'
   'inject_out': '\[0,1\]Injected\spacket\srate\saverage\s=\s(.*)'

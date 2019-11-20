@@ -61,6 +61,12 @@ parser.add_option("-S", "--stats_yml", dest="stats_yml", default="",
                   help="The yaml file that defines the stats you want to collect." + \
                        " by default it uses stats/example_stats.yml")
 
+parser.add_option("-e", '--exclude-conf', dest='exclude', default='',
+                  help='Exclude configs with these strings. Comma separated list.')
+parser.add_option("-i", '--include-conf', dest='include', default='',
+                  help='Exclude configs with these strings. Comma separated list.')
+
+
 parser.add_option("-o", "--output", dest="outfile", default="result.csv",
                   help="The logfile to save csv to.")
 
@@ -88,6 +94,9 @@ options.stats_yml = common.file_option_test(options.stats_yml,
                                             this_directory)
 
 stats_to_pull = load_stats_yamls(options.stats_yml)
+
+options.exclude = list(filter(None, options.exclude.split(',')))
+options.include = list(filter(None, options.include.split(',')))
 
 # 3. Look for matching log files
 
@@ -130,6 +139,13 @@ for logfile in named_sim:
     with open(logfile) as f:
         for line in f:
             jobtime, jobId, pair_str, config, gpusim_version = line.split()
+
+            # check exclude strings
+            if options.exclude and any(exclude in config for exclude in options.exclude):
+                continue
+
+            if options.include and not all(include in config for include in options.include):
+                continue
 
             configs.add(config)
             apps_and_args.add(pair_str)
