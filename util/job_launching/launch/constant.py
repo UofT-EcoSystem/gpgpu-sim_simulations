@@ -11,6 +11,8 @@ app_dict = {'cut_sgemm-0': [2, 128],
         'parb_spmv-0': [16, 1147],
         }
 
+mem_intense = ['parb_stencil-0', 'parb_lbm-0', 'parb_spmv-0']
+
 DEFAULT_BENCH_HOME = "/mnt/GPU-Virtualization-Benchmarks/benchmarksv2"
 RUN_HOME = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
 NUM_SM = 80
