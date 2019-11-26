@@ -22,6 +22,8 @@ def parse_args():
 
     parser.add_argument('--pair', required=True, nargs='+',
                         help="Apps to run.")
+    parser.add_argument('--how', choices=['smk', 'static', 'dynamic'],
+                        help='How to partition resources between benchmarks.')
     parser.add_argument('--bench_home', default=DEFAULT_BENCH_HOME,
                         help='Benchmark home folder.')
     parser.add_argument('--no_launch', default=False, action='store_true',
@@ -51,21 +53,28 @@ for pair in args.pair:
 
     base_config = "TITANV-SEP_RW-CONCURRENT"
 
-    # intra SM config
-    intra_values = [str(app_df.loc[app, 'intra']) for app in apps]
-    intra_sm = 'INTRA_0:' + ':'.join(intra_values) + '_CTA'
+    if args.how == 'smk':
+        config_str = base_config
+    elif args.how == 'static':
+        # intra SM config
+        intra_values = [str(app_df.loc[app, 'intra']) for app in apps]
+        intra_sm = 'INTRA_0:' + ':'.join(intra_values) + '_CTA'
 
-    # L2 partition config
-    # l2_values = [str(app_df.loc[app, 'l2']) for app in apps]
-    # FIXME: temp set all L2 partition to 0.5
-    l2_values = ['0.5' for app in apps]
-    l2 = 'PARTITION_L2_0:' + ':'.join(l2_values)
+        # L2 partition config
+        # l2_values = [str(app_df.loc[app, 'l2']) for app in apps]
+        # FIXME: temp set all L2 partition to 0.5
+        l2_values = ['0.5' for app in apps]
 
-    config_str = '-'.join([base_config, intra_sm, l2])
+        l2 = 'PARTITION_L2_0:' + ':'.join(l2_values)
 
-    # L2 bypass config
-    if app_df.loc[apps[0], 'bypassl2']:
-        config_str += "-BYPASS_L2D_S1"
+        config_str = '-'.join([base_config, intra_sm, l2])
+
+        # L2 bypass config
+        if app_df.loc[apps[0], 'bypassl2']:
+            config_str += "-BYPASS_L2D_S1"
+    else:
+        # TODO: dynamic sharing policy
+        print('Unimplemented error')
 
     cmd = ['python',
            os.path.join(RUN_HOME, 'run_simulations.py'),
