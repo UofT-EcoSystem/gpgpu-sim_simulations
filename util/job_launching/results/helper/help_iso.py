@@ -11,9 +11,13 @@ import os
 mpl.style.use('seaborn-paper')
 
 # each tuple contains: regex, dtype
-regex_table = {'intra': r'INTRA_0:(.*):0_CTA',
-               'inter': r'INTER_0:(.*):0_SM',
-               'l2': r'PARTITION_L2_0:(.*):[0-9|\.]+'}
+regex_table = {'intra': r'INTRA_0:(.*):[0-9]+_CTA',
+               'inter': r'INTER_0:(.*):[0-9]+_SM',
+               'l2': r'PARTITION_L2_0:(.*):[0-9|\.]+',
+               'intra_2': r'INTRA_0:[0-9]+:(.*)_CTA',
+               'inter_2': r'INTER_0:[0-9]+:(.*)_SM',
+               'l2_2': r'PARTITION_L2_0:[0-9|\.]+:([0-9|\.]+)',
+               }
 
 type_table = {'intra': int,
               'inter': int,
