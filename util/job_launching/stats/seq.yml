@@ -38,6 +38,18 @@
     'partiton_level_parallism_util_total\s*=\s*(.*)'
   'L2_reservation_fail':
     'L2_total_cache_reservation_fails\s=\s(.*)'
+  'empty_warp':
+    'Empty\swarp:(.*)\tStall'
+  'stall_warp':
+    'Stall:(.*)\tW0_Idle'
+  'idle_warp':
+    'W0_Idle:(.*)\tW0_Score'
+  'scoreboard_warp':
+    'W0_Scoreboard:(.*)\tW1:'
+  'regs':
+    'regs=(.*),\slmem'
+  'smem':
+    'smem=(.*),'
 'vector':
   'dram_eff': 'dram_eff=(.*)$'
   'dram_bw': 'bw_util=(.*)$'

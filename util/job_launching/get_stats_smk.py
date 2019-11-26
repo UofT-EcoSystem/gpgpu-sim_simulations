@@ -33,7 +33,7 @@ def load_stats_yamls(filename):
         for stat in collections['vector']:
             collections['vector'][stat] = (re.compile(collections['vector'][stat]), 'vector')
 
-    collections['scalar'].update(collections['vector'])
+        collections['scalar'].update(collections['vector'])
 
     return collections['scalar']
 
