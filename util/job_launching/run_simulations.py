@@ -9,6 +9,7 @@ import shutil
 import glob
 import datetime
 import common
+import filecmp
 
 this_directory = os.path.dirname(os.path.realpath(__file__))
 
@@ -132,10 +133,9 @@ class ConfigurationSpec:
             # Submit the job to torque and dump the output to a file
             saved_dir = os.getcwd()
             os.chdir(this_run_dir)
-            p = subprocess.run(["qsub",
-                                "-W", "umask=022",
-                                os.path.join(this_run_dir, "torque.sim")],
-                               stdout=subprocess.PIPE)
+            cmd = ["qsub", "-W", "umask=022", os.path.join(this_run_dir, "torque.sim")]
+            
+            p = subprocess.run(cmd, stdout=subprocess.PIPE)
 
             if p.returncode > 0:
                 exit("Error Launching Torque Job")
@@ -307,7 +307,10 @@ def main():
         except:
             pass
 
-    shutil.copyfile(so_path, os.path.join(running_so_dir, "libcudart.so." + cuda_version))
+    src = so_path
+    dst = os.path.join(running_so_dir, "libcudart.so." + cuda_version)
+    if not os.path.exists(dst) or not filecmp.cmp(src, dst):
+        shutil.copyfile(src, dst)
     options.so_dir = running_so_dir
 
     # 3. Load yaml defines
