@@ -46,6 +46,8 @@
     'W0_Idle:(.*)\tW0_Score'
   'scoreboard_warp':
     'W0_Scoreboard:(.*)\tW1:'
+  'tot_warp_insn':
+    'gpgpu_n_tot_w_icount\s=\s(.*)'
   'regs':
     'regs=(.*),\slmem'
   'smem':

@@ -53,6 +53,9 @@ INTRA_?_CTA:
 INTER_?_SM:
   extra_params: "-gpgpu_sharing_intra_sm 0 -max_sm_in_stream ?"
 
+ICNT_?_PRIORITY:
+  extra_params: "-icnt_priority ?" 
+
 BYPASS_L2:
   extra_params: "-gpgpu_cache:dl2 none -gpgpu_cache:il1 N:64:128:16,L:R:f:N:L,A:2:48,4 -gpgpu_const_cache:l1 N:128:64:8,L:R:f:N:L,A:2:64,4"
 
@@ -67,6 +70,12 @@ SEP_RW:
 
 PARTITION_L2_?:
   extra_params: "-l2_partition_enabled 1 -l2_partition ?"
+
+L2_MERGE_2X:
+  extra_params: "-gpgpu_cache:dl2 S:32:128:24,L:B:m:L:L,A:192:8,32:0,32"
+
+L2_MSHR_2X:
+  extra_params: "-gpgpu_cache:dl2 S:32:128:24,L:B:m:L:L,A:384:8,32:0,32"
 
 # Experimental - for SM 60 PTXplus support
 PTXPLUS_SM6:
