@@ -14,9 +14,9 @@ mpl.style.use('seaborn-paper')
 regex_table = {'intra': r'INTRA_0:(.*):[0-9]+_CTA',
                'inter': r'INTER_0:(.*):[0-9]+_SM',
                'l2': r'PARTITION_L2_0:(.*):[0-9|\.]+',
-               'intra_2': r'INTRA_0:[0-9]+:(.*)_CTA',
-               'inter_2': r'INTER_0:[0-9]+:(.*)_SM',
-               'l2_2': r'PARTITION_L2_0:[0-9|\.]+:([0-9|\.]+)',
+               '2_intra': r'INTRA_0:[0-9]+:(.*)_CTA',
+               '2_inter': r'INTER_0:[0-9]+:(.*)_SM',
+               '2_l2': r'PARTITION_L2_0:[0-9|\.]+:([0-9|\.]+)',
                }
 
 type_table = {'intra': int,
