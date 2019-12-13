@@ -134,7 +134,7 @@ class ConfigurationSpec:
             saved_dir = os.getcwd()
             os.chdir(this_run_dir)
             cmd = ["qsub", "-W", "umask=022", os.path.join(this_run_dir, "torque.sim")]
-            
+
             p = subprocess.run(cmd, stdout=subprocess.PIPE)
 
             if p.returncode > 0:
@@ -172,7 +172,8 @@ class ConfigurationSpec:
                            torque_jobid,
                            pair_str,
                            self.config_name,
-                           ConfigurationSpec.version_string), file=logfile)
+                           ConfigurationSpec.version_string),
+                          file=logfile)
 
     #########################################################################################
     # Internal utility methods
