@@ -10,6 +10,7 @@ app_dict = {'cut_sgemm-0': [2, 128],
         'parb_lbm-0': [12, 18000],
         'parb_spmv-0': [16, 1147],
         'rod_mummer-0': [8, 5727],
+        'rod_heartwall-0': [1, 51],
         }
 
 mem_intense = ['parb_stencil-0', 'parb_lbm-0', 'parb_spmv-0']

@@ -67,6 +67,14 @@ rodinia:
   execs:
     - rod_mummer:
       - DATA/mummergpu/NC_003997.fna DATA/mummergpu/NC_003997_q100bp.fna
+    - rod_heartwall:
+      - DATA/heartwall/test.avi 20%
+    - rod_hotspot:
+      - 512 2 2 DATA/hotspot/temp_512 DATA/hotspot/power_512 output.out
+    - rod_streamcluster:
+      - 10 20 256 65536 65536 1000 none output.txt 1
+    - rod_pathfinder:
+      - 100000 100 20
 
 
         ################## END TESTED portion #################

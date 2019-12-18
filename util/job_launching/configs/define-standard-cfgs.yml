@@ -77,18 +77,16 @@ L2_MERGE_2X:
 L2_MSHR_2X:
   extra_params: "-gpgpu_cache:dl2 S:32:128:24,L:B:m:L:L,A:384:8,32:0,32"
 
+RANDOM:
+  extra_params: "-memory_partition_indexing 4"
+
+PAE:
+  extra_params: "-memory_partition_indexing 3"
+
+ADDR_TEST:
+  extra_params: "-gpgpu_mem_addr_test 1"
+
 # Experimental - for SM 60 PTXplus support
 PTXPLUS_SM6:
     extra_params: "-gpgpu_ptx_convert_to_ptxplus 1 -gpgpu_ptx_force_max_capability 62 -gpgpu_ptx_force_min_capability 60"
 
-##############################################################################
-##############################################################################
-# Deprecated files in the public repo
-QUADROFX5600:
-    base_file: "$GPGPUSIM_ROOT/configs/4.x-cfgs/SM1_QFX5600/gpgpusim.config"
-
-QUADROFX5800:
-    base_file: "$GPGPUSIM_ROOT/configs/4.x-cfgs/SM1_QFX5800/gpgpusim.config"
-
-TESLAC2050:
-    base_file: "$GPGPUSIM_ROOT/configs/4.x-cfgs/SM2_C2050/gpgpusim.config"
