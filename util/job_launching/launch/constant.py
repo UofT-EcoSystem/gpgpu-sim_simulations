@@ -1,5 +1,5 @@
 import os
-# max ctas according to resource constraints, grid size
+# max ctas according to [resource constraints, grid size]
 app_dict = {'cut_sgemm-0': [2, 128],
         'cut_sgemm-1': [2, 512],
         'cut_wmma-0': [4, 128],
@@ -11,6 +11,12 @@ app_dict = {'cut_sgemm-0': [2, 128],
         'parb_spmv-0': [16, 1147],
         'rod_mummer-0': [8, 5727],
         'rod_heartwall-0': [1, 51],
+        'rod_hotspot-0': [0,0],
+        'rod_hotspot3d-0': [0,0],
+        'rod_streamcluster': [0,0],
+        'rod_pathfinder': [0,0],
+        'rod_lavamd': [0,0],
+        'rod_myocyte': [0,0],
         }
 
 mem_intense = ['parb_stencil-0', 'parb_lbm-0', 'parb_spmv-0']
