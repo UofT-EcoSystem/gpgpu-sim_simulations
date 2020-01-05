@@ -71,10 +71,16 @@ rodinia:
       - DATA/heartwall/test.avi 20%
     - rod_hotspot:
       - 512 2 2 DATA/hotspot/temp_512 DATA/hotspot/power_512 output.out
+    - rod_hotspot3d:
+      - 512 8 100 DATA/hotspot3D/power_512x8 DATA/hotspot3D/temp_512x8 output.out
     - rod_streamcluster:
       - 10 20 256 65536 65536 1000 none output.txt 1
     - rod_pathfinder:
       - 100000 100 20
+    - rod_lavamd:
+      - -boxes1d 10
+    - rod_myocyte:
+      - 100 1 0
 
 
         ################## END TESTED portion #################
