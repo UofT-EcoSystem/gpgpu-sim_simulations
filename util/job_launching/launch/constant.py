@@ -14,10 +14,9 @@ app_dict = {
             'rod_heartwall-0': [5, 51],
             'rod_hotspot-0': [8, 1849],
             'rod_hotspot3d-0': [8, 1024],
-            'rod_streamcluster-0': [0,0],
+            'rod_streamcluster-0': [3, 128],
             'rod_pathfinder-0': [8, 463],
-            'rod_lavamd-0': [0,0],
-            'rod_myocyte-0': [0,0],
+            'rod_lavamd-0': [9, 1000],
            }
 
 mem_intense = ['parb_stencil-0', 'parb_lbm-0', 'parb_spmv-0']
