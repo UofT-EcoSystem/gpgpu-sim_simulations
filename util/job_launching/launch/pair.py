@@ -28,6 +28,9 @@ def parse_args():
                         help='Benchmark home folder.')
     parser.add_argument('--no_launch', default=False, action='store_true',
                         help='Do not actually trigger job launching.')
+    parser.add_argument('--random', default=False, action='store_true',
+                        help='Use random address mapping for global access.')
+
 
     results = parser.parse_args()
 
@@ -52,6 +55,8 @@ for pair in args.pair:
         continue
 
     base_config = "TITANV-SEP_RW-CONCURRENT"
+    if args.random:
+        base_config += "-RANDOM"
 
     if args.how == 'smk':
         config_str = base_config
