@@ -4,9 +4,12 @@ from matplotlib.backends.backend_pdf import PdfPages
 import argparse
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 
 import common.help_iso as hi
 import common.constants as const
+
+mpl.style.use('seaborn-paper')
 
 
 def print_intra(df, benchmark):
