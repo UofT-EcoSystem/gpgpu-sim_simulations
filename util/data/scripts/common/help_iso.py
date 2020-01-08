@@ -10,6 +10,11 @@ import os
 
 mpl.style.use('seaborn-paper')
 
+# bench -> C(0)/M(1)
+bench_dict = {'cut_sgemm-0':0, 'cut_sgemm-1':0, 'cut_wmma-0': 0, 'cut_wmma-1': 0,
+              'parb_stencil-0': 1, 'parb_sgemm-0': 0,
+              'parb_lbm-0': 1, 'parb_spmv-0': 1, 'parb_cutcp-0': 0}
+
 # each tuple contains: regex, dtype
 regex_table = {'intra': r'INTRA_0:(.*):[0-9]+_CTA',
                'inter': r'INTER_0:(.*):[0-9]+_SM',
@@ -52,6 +57,13 @@ def avg_array(s):
 def process_config_column(*configs, df):
     for c in configs:
         df[c] = df['config'].apply(lambda x: re.search(regex_table[c], x).group(1)).astype(type_table.get(c, float))
+
+
+def normalize(df, index, metric, value, inverse):
+    if inverse:
+        return df.loc[index, metric] / value
+    else:
+        return value / df.loc[index, metric]
 
 
 def plot_heatmap(df, x_key, y_key, z_key, title, axis, scale, cmap=cmap_green):
