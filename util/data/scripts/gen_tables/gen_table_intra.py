@@ -1,5 +1,4 @@
 import common.help_iso as hi
-import common.format as fmt
 import common.constants as const
 
 import argparse
