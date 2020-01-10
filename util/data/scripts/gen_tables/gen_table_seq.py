@@ -24,6 +24,7 @@ args = parse_args()
 # Read CSV file
 # df = pd.read_csv(args.csv, index_col='pair_str')
 df = pd.read_csv(args.csv)
+df.sort_values('pair_str', inplace=True)
 
 # TODO: process columns in seq df
 

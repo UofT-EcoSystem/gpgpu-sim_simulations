@@ -42,14 +42,13 @@ def parse_args():
                         default='ipc',
                         help='metrics: print all relevant metrics per benchmark. ipc: print IPC heatmaps only.')
     parser.add_argument('--benchmark',
-                        default='all',
+                        default=['all'],
                         nargs='+',
                         help='Individual benchmark to print heatmaps')
-    parser.add_argument('--subplots',
-                        nargs='+',
+    parser.add_argument('--maxwidth',
                         type=int,
-                        help='Dimension of subplots in plots. Expect two values for height and width. '
-                             'Only used for ipc only mode')
+                        default=14,
+                        help='Max width in grid for matplotlib')
     parser.add_argument('--figsize',
                         nargs='+',
                         type=int,
@@ -60,17 +59,35 @@ def parse_args():
     return results
 
 
-def print_ipc_only(df, benchmarks, subplots, figsize):
+def print_ipc_only(df, benchmarks, maxGridWidth, figsize):
     print(benchmarks)
-    fig_tot, axs = plt.subplots(subplots[0], subplots[1], figsize=figsize)
-    axs = axs.flat
+    fig_tot = plt.figure(figsize=figsize)
 
-    for ax, bench in zip(axs, benchmarks):
+    cols = 0
+    rows = 1
+    for bench in benchmarks:
+        width = len(df[df['pair_str'] == bench]['intra'].unique())
+        running_sum = cols + width
+        if running_sum > maxGridWidth:
+            rows += 1
+            cols = width
+        else:
+            cols = running_sum
+
+    gs = mpl.gridspec.GridSpec(rows, maxGridWidth)
+
+    gs_height = 0
+    gs_width = 0
+
+    #for ax, bench in zip(axs, benchmarks):
+    for bench in benchmarks:
         _df = df[df['pair_str'] == bench]
 
-        hi.plot_heatmap(_df, x_key='intra', y_key='l2', z_key='norm_ipc', title=bench, axis=ax, scale=1.2)
+        gs_height, gs_width = hi.plot_heatmap(_df, x_key='intra', y_key='l2', z_key='norm_ipc', 
+                title=bench, scale=1.5, gs=gs, gs_height=gs_height, gs_width=gs_width, gs_width_max= maxGridWidth)
 
-    fig_tot.suptitle('Intra, Normalized IPC', fontsize=18)
+    plt.tight_layout()
+    # fig_tot.suptitle('Intra, Normalized IPC', fontsize=18)
     fig_tot.savefig(os.path.join(const.DATA_HOME, 'graphs/total.pdf'))
     plt.close()
 
@@ -89,10 +106,7 @@ def main():
         for bench in args.benchmark:
             print_intra(df_intra, bench)
     elif args.content == 'ipc':
-        if not args.subplots:
-            args.subplots = [len(args.benchmark), 1]
-
-        print_ipc_only(df_intra, args.benchmark, args.subplots, tuple(args.figsize))
+        print_ipc_only(df_intra, args.benchmark, args.maxwidth, tuple(args.figsize))
 
 
 if __name__ == '__main__':

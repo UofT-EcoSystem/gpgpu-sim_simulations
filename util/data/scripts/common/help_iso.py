@@ -69,7 +69,8 @@ def normalize(df, index, metric, value, inverse):
         return value / df.loc[index, metric]
 
 
-def plot_heatmap(df, x_key, y_key, z_key, title, axis, scale, cmap=cmap_green):
+def plot_heatmap(df, x_key, y_key, z_key, title, scale, 
+        gs, gs_height, gs_width, gs_width_max, cmap=cmap_green):
     df = df.sort_values([y_key, x_key], ascending=[False, True])
 
     num_cols = len(df[y_key].unique())
@@ -83,15 +84,24 @@ def plot_heatmap(df, x_key, y_key, z_key, title, axis, scale, cmap=cmap_green):
 
     sns.set(font_scale=scale)
 
+    gs_width_end = gs_width + len(df[x_key].unique())
+    if gs_width_end > gs_width_max:
+        gs_height += 1
+        gs_width = 0
+        gs_width_end = len(df[x_key].unique())
+    axis = plt.subplot(gs[gs_height, gs_width:gs_width_end])
     sns.heatmap(data, ax=axis, linewidth=0.2, linecolor='white',
                 square=True, cmap=cmap,  # vmin=cbar_lim[0], vmax=cbar_lim[1],
                 xticklabels=df[x_key].unique(), yticklabels=df[y_key].unique(),
                 annot=True, fmt=fmt,
+                cbar = False,
                 cbar_kws={'label': metric_label[z_key]}
                 )
     axis.set_xlabel(metric_label[x_key])
     axis.set_ylabel(metric_label[y_key])
     axis.set_title(title)
+
+    return gs_height, gs_width_end
 
 
 def plot_line(df, x_key, y_key, z_key, title, axis, scale):
