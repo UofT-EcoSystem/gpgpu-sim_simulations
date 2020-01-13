@@ -1,4 +1,5 @@
 import common.constants as const
+import common.help_iso as hi
 
 import argparse
 import os
@@ -26,7 +27,15 @@ args = parse_args()
 df = pd.read_csv(args.csv)
 df.sort_values('pair_str', inplace=True)
 
-# TODO: process columns in seq df
+# drop any benchmarks that have zero runtime
+df = df[df['runtime'] > 0]
+
+# avg dram bandwidth
+df['avg_dram_bw'] = df['dram_bw'].transform(hi.avg_array)
+
+# standard deviation of dram bandwidth among channels
+df['std_dram_bw'] = df['dram_bw'].transform(hi.std_array)
+df['ratio_dram_bw'] = df['std_dram_bw'] / df['avg_dram_bw']
 
 # Output pickle
 df.to_pickle(args.output)

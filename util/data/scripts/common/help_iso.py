@@ -57,6 +57,11 @@ def avg_array(s):
     return np.array(result)
 
 
+def std_array(s):
+    result = [np.std(np.array(v[1:-1].split(' ')).astype(float)) for v in s]
+    return np.array(result)
+
+
 def process_config_column(*configs, df):
     for c in configs:
         df[c] = df['config'].apply(lambda x: re.search(regex_table[c], x).group(1)).astype(type_table.get(c, float))
